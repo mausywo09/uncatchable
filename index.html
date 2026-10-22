@@ -1,0 +1,1634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$UNCATCHABLE | Catch nothing. Hold everything.</title>
+<meta name="description" content="$UNCATCHABLE is a meme universe on Solana where card collectors and crypto holders chase the one that always gets away. The Collector, The Holder, The Scalper and The Rugger. Which one are you?">
+<meta name="theme-color" content="#0b1240">
+<meta property="og:type" content="website">
+<meta property="og:title" content="$UNCATCHABLE | Catch nothing. Hold everything.">
+<meta property="og:description" content="A meme universe where card collectors and crypto holders chase the one that always gets away. Which one are you?">
+<meta property="og:url" content="https://uncatchable.fun/">
+<meta property="og:image" content="https://uncatchable.fun/og-image.png">
+<link rel="canonical" href="https://uncatchable.fun/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@UNCATCHABLECOIN">
+<meta name="twitter:title" content="$UNCATCHABLE | Catch nothing. Hold everything.">
+<meta name="twitter:description" content="The Collector, The Holder, The Scalper and The Rugger. Which one are you?">
+<meta name="twitter:image" content="https://uncatchable.fun/og-image.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="img/logo.webp">
+<script>
+// Decide before the first paint whether the 3D intro plays, so the hero never flashes first.
+// It plays once per browser session; ?intro=1 replays it, ?intro=debug pauses it for frame checks.
+(function () {
+  var force = /[?&]intro=(1|debug)\b/.test(location.search);
+  var seen = false, gl = false;
+  try { seen = sessionStorage.getItem('unc-intro') === '1'; } catch (e) {}
+  try {
+    var c = document.createElement('canvas');
+    var ctx = window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl'));
+    gl = !!ctx;
+    var lose = ctx && ctx.getExtension('WEBGL_lose_context');
+    if (lose) lose.loseContext();
+  } catch (e) {}
+  var calm = matchMedia('(prefers-reduced-motion: reduce)').matches || (navigator.connection && navigator.connection.saveData);
+  if (gl && (force || (!seen && !location.hash && !calm))) document.documentElement.classList.add('intro-on');
+})();
+</script>
+<style>
+:root {
+  --night: #060a1f;
+  --navy: #0c1340;
+  --navy-2: #15206a;
+  --panel: rgba(17, 26, 82, .72);
+  --line: rgba(255, 210, 110, .2);
+  --gold: #ffc83d;
+  --gold-hi: #ffe27a;
+  --gold-deep: #c46f00;
+  --amber: #ff9d2e;
+  --text: #eef1ff;
+  --muted: #aab3dd;
+  --collector: #36a6ff;
+  --holder: #8bd43b;
+  --scalper: #9b5cff;
+  --rugger: #d27f33;
+  --myth: #ffb81c;
+  --radius: 22px;
+  --display: 'Luckiest Guy', 'Arial Black', Impact, sans-serif;
+  --body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+* { box-sizing: border-box; }
+/* the gutter stays reserved while the intro hides the scrollbar, so the hero does not shift when it ends */
+html { scroll-behavior: smooth; scroll-padding-top: 80px; scrollbar-gutter: stable; }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--text);
+  font: 500 17px/1.6 var(--body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+.wrap { width: min(1160px, 100% - 32px); margin-inline: auto; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:focus-visible { outline: 3px solid var(--gold-hi); outline-offset: 3px; border-radius: 8px; }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px 24px; border-radius: 999px; border: 0; cursor: pointer;
+  font: 900 16px/1 var(--body); letter-spacing: .02em; text-decoration: none;
+  transition: transform .15s ease, box-shadow .15s ease, background .2s;
+}
+.btn svg { width: 20px; height: 20px; flex: none; }
+.btn-gold {
+  background: linear-gradient(#ffe27a, #ffb21c);
+  color: #2a1600;
+  box-shadow: 0 4px 0 var(--gold-deep), 0 12px 28px rgba(255, 170, 0, .28);
+}
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--gold-deep), 0 16px 32px rgba(255, 170, 0, .35); }
+.btn-gold:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold-deep), 0 6px 14px rgba(255, 170, 0, .2); }
+.btn-ghost { background: rgba(255, 255, 255, .06); color: #fff; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .22); }
+.btn-ghost:hover { background: rgba(255, 255, 255, .12); transform: translateY(-2px); }
+.btn[aria-disabled="true"] { opacity: .55; pointer-events: none; }
+
+/* ---------- nav ---------- */
+.nav {
+  position: fixed; inset: 0 0 auto; z-index: 50;
+  transition: background .3s, box-shadow .3s;
+}
+.nav.scrolled { background: rgba(8, 12, 40, .82); backdrop-filter: blur(14px); box-shadow: 0 1px 0 var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 24px; height: 68px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 400 22px/1 var(--display); letter-spacing: .02em; }
+.brand img { width: 38px; height: 38px; border-radius: 50%; box-shadow: 0 0 0 2px var(--gold); }
+.nav-links { display: flex; gap: 22px; margin-left: auto; list-style: none; padding: 0; }
+.nav-links a { text-decoration: none; font-weight: 800; font-size: 15px; color: var(--muted); transition: color .2s; }
+.nav-links a:hover { color: #fff; }
+.nav .btn { padding: 11px 18px; font-size: 14px; }
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .nav .btn { margin-left: auto; }
+}
+@media (max-width: 460px) { .nav .btn .long { display: none; } }
+
+/* ---------- hero ---------- */
+.hero {
+  position: relative; min-height: 100svh; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding-top: 96px;
+  background:
+    radial-gradient(55% 45% at 50% 32%, rgba(255, 168, 60, .30), transparent 70%),
+    radial-gradient(38% 40% at 10% 85%, rgba(155, 92, 255, .30), transparent 70%),
+    radial-gradient(38% 40% at 92% 80%, rgba(54, 166, 255, .26), transparent 70%),
+    linear-gradient(#0d1648, #070b25 80%);
+}
+.hero::before {
+  /* warm shop-light bokeh */
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .55;
+  background:
+    radial-gradient(6px 6px at 12% 22%, #ffd27a, transparent),
+    radial-gradient(9px 9px at 24% 12%, #ffb84d, transparent),
+    radial-gradient(5px 5px at 78% 18%, #ffe0a0, transparent),
+    radial-gradient(8px 8px at 88% 30%, #ffc266, transparent),
+    radial-gradient(4px 4px at 66% 9%, #fff0c4, transparent),
+    radial-gradient(7px 7px at 38% 6%, #ffcf70, transparent);
+  filter: blur(1px);
+}
+.hero-inner { position: relative; z-index: 3; flex: 1; display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(20px, 4vw, 56px); align-items: center; }
+.hero-copy { display: grid; justify-items: start; }
+.pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 16px; border-radius: 999px;
+  background: rgba(255, 255, 255, .07); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
+  font-weight: 800; font-size: 14px; letter-spacing: .04em;
+}
+.pill i { width: 9px; height: 9px; border-radius: 50%; background: var(--holder); box-shadow: 0 0 0 0 rgba(139, 212, 59, .7); animation: ping 1.8s infinite; }
+@keyframes ping { 70% { box-shadow: 0 0 0 10px rgba(139, 212, 59, 0); } 100% { box-shadow: 0 0 0 0 rgba(139, 212, 59, 0); } }
+/* the logo shrinks with the window height so the buttons and the curb stay on the first screen */
+.hero-logo { width: min(100%, 640px, calc((100svh - 330px) * 1.4)); min-width: 260px; margin-inline: auto; filter: drop-shadow(0 18px 40px rgba(0, 0, 0, .45)); animation: hover-logo 6s ease-in-out infinite; }
+@keyframes hover-logo { 50% { transform: translateY(-10px) rotate(-.6deg); } }
+/* sized so "Hold everything." (8.4em wide) stays on one line in the hero column */
+.tagline { margin: 18px 0 0; font: 400 clamp(34px, 4.1vw, 60px)/.98 var(--display); letter-spacing: .01em; color: var(--gold-hi); text-shadow: 0 3px 0 #b86a00, 0 6px 0 #4a2500, 0 16px 30px rgba(0, 0, 0, .5); }
+.lede { max-width: 480px; margin: 16px 0 0; color: #d6dcff; font-size: clamp(16px, 1.7vw, 19px); }
+.hero .cta-row { justify-content: flex-start; }
+@media (max-width: 860px) {
+  .hero-inner { grid-template-columns: 1fr; text-align: center; }
+  .hero-copy { justify-items: center; }
+  .hero-logo { width: min(100%, 500px); min-width: 0; }
+  .lede { margin-inline: auto; }
+  .hero .cta-row { justify-content: center; }
+}
+.ca-box {
+  margin-top: 22px; display: flex; align-items: center; gap: 10px; max-width: 100%;
+  padding: 8px 8px 8px 18px; border-radius: 16px;
+  background: rgba(6, 10, 34, .7); box-shadow: inset 0 0 0 1px var(--line);
+}
+.ca-box b { font: 900 13px/1 var(--body); letter-spacing: .14em; color: var(--gold); }
+.ca-box code { font: 700 15px/1.2 ui-monospace, Consolas, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.copy {
+  flex: none; border: 0; cursor: pointer; border-radius: 11px; padding: 9px 13px;
+  background: rgba(255, 255, 255, .1); font-weight: 800; font-size: 13px; display: inline-flex; gap: 6px; align-items: center;
+}
+.copy:hover { background: rgba(255, 255, 255, .18); }
+.copy svg { width: 15px; height: 15px; }
+.cta-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 22px; }
+
+.floaters { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.floater { position: absolute; animation: drift var(--t, 8s) ease-in-out infinite; animation-delay: var(--d, 0s); }
+@keyframes drift {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50% { transform: translateY(-22px) rotate(calc(var(--r, 0deg) + 8deg)); }
+}
+.mini-card {
+  width: var(--s, 62px); aspect-ratio: 5 / 7; border-radius: 9px;
+  background: radial-gradient(circle at 50% 45%, #2c3fa8, #0e1650 70%);
+  border: 3px solid var(--gold); box-shadow: 0 10px 24px rgba(0, 0, 0, .45), inset 0 0 0 2px #0a0f33;
+  display: grid; place-items: center; color: var(--gold); font-size: calc(var(--s, 62px) * .42);
+}
+.mini-card::after { content: '★'; text-shadow: 0 0 12px rgba(255, 200, 61, .8); }
+.floater img.coin { width: var(--s, 56px); filter: drop-shadow(0 8px 16px rgba(0, 0, 0, .45)); }
+/* on one column the middle floaters would sit on the text */
+@media (max-width: 860px) { .floater:nth-child(2), .floater:nth-child(4) { display: none; } }
+
+.curb { position: relative; z-index: 2; margin-top: 34px; }
+.curb-row { display: flex; justify-content: center; align-items: flex-end; gap: clamp(2px, 2.4vw, 34px); padding: 0 12px; }
+.mate { position: relative; cursor: pointer; border: 0; background: none; padding: 0; }
+.mate img { height: clamp(84px, min(15vw, 22svh), 190px); width: auto; transform-origin: 50% 100%; transition: transform .35s cubic-bezier(.3, 1.6, .5, 1); filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .5)); }
+.mate:hover img, .mate:focus-visible img { transform: translateY(-14px) scale(1.04); }
+.mate .say {
+  position: absolute; left: 50%; bottom: calc(100% - 4px); transform: translate(-50%, 8px) scale(.9);
+  white-space: nowrap; padding: 7px 13px; border-radius: 12px; opacity: 0;
+  background: #fff; color: #1a1440; font: 900 14px/1 var(--body);
+  transition: opacity .2s, transform .25s; pointer-events: none;
+}
+.mate .say::after { content: ''; position: absolute; left: 50%; top: 100%; margin-left: -7px; border: 7px solid transparent; border-top-color: #fff; }
+.mate:hover .say, .mate:focus-visible .say { opacity: 1; transform: translate(-50%, -6px) scale(1); }
+.shelf {
+  height: 26px; margin-top: -6px; position: relative;
+  background: linear-gradient(#ffd27a, #c47a1d 30%, #7a4410 70%, #3a1e08);
+  box-shadow: 0 -2px 20px rgba(255, 170, 60, .35), 0 20px 40px rgba(0, 0, 0, .55);
+}
+.shelf::after { content: 'OUT OF STOCK'; position: absolute; right: max(16px, 6vw); top: 50%; transform: translateY(-50%) rotate(-3deg); font: 900 11px/1 var(--body); letter-spacing: .16em; color: #fff; background: #d8322b; padding: 6px 9px; border-radius: 4px; box-shadow: 0 3px 8px rgba(0, 0, 0, .4); }
+
+/* ---------- marquee ---------- */
+.marquee { background: var(--gold); color: #261300; overflow: hidden; border-block: 3px solid #2a1600; }
+.marquee-track { display: flex; width: max-content; animation: marquee 38s linear infinite; }
+.marquee span { padding: 13px 0; font: 400 20px/1 var(--display); letter-spacing: .03em; white-space: nowrap; }
+.marquee span::after { content: '✦'; margin: 0 22px; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ---------- sections ---------- */
+.section { position: relative; padding: clamp(76px, 10vw, 130px) 0; }
+.section.alt { background: linear-gradient(#0a1033, #0d1546 50%, #0a1033); }
+.kicker { display: inline-block; font: 900 13px/1 var(--body); letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+h2 {
+  margin: 0; font: 400 clamp(40px, 6.4vw, 76px)/.95 var(--display); letter-spacing: .01em;
+  color: var(--gold-hi); text-shadow: 0 3px 0 #b86a00, 0 6px 0 #4a2500, 0 16px 30px rgba(0, 0, 0, .45);
+}
+h3 { margin: 0; font: 400 26px/1.05 var(--display); letter-spacing: .02em; }
+.sec-head { text-align: center; max-width: 760px; margin: 0 auto clamp(40px, 6vw, 64px); }
+.sec-head p { color: var(--muted); font-size: 18px; margin: 18px auto 0; max-width: 620px; }
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s cubic-bezier(.2, .8, .2, 1); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* story */
+.story { display: grid; grid-template-columns: 1fr 1.05fr; gap: clamp(32px, 6vw, 72px); align-items: center; }
+.story blockquote { margin: 26px 0 0; font: 800 clamp(20px, 2.4vw, 25px)/1.4 var(--body); color: #fff; }
+.story blockquote em { color: var(--gold); font-style: normal; }
+.story p { color: #cfd5f5; }
+.frame {
+  position: relative; border-radius: var(--radius); padding: 8px;
+  background: linear-gradient(145deg, #ffe08a, #c98a1a 45%, #ffd56a 70%, #a8650a);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .5); transform: rotate(1.5deg);
+}
+.frame img { border-radius: 15px; width: 100%; aspect-ratio: 5 / 2; object-fit: cover; }
+.frame .stamp {
+  position: absolute; left: -14px; bottom: -18px; transform: rotate(-8deg);
+  background: #d8322b; color: #fff; font: 400 20px/1 var(--display); letter-spacing: .04em;
+  padding: 10px 16px; border-radius: 8px; box-shadow: 0 8px 20px rgba(0, 0, 0, .45);
+}
+.worlds { display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: stretch; margin-top: clamp(56px, 8vw, 90px); }
+.world {
+  border-radius: var(--radius); padding: 26px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line);
+  display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center;
+}
+.world .duo { display: flex; }
+.world .duo img { width: 74px; height: 74px; object-fit: contain; }
+.world .duo img + img { margin-left: -16px; }
+.world small { font: 900 12px/1 var(--body); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.world h3 { margin-top: 6px; }
+.world p { margin: 6px 0 0; color: #cfd5f5; font-size: 15px; }
+.vs { align-self: center; font: 400 30px/1 var(--display); color: var(--gold); text-shadow: 0 3px 0 #8a4a00; }
+@media (max-width: 860px) {
+  .story { grid-template-columns: 1fr; }
+  .worlds { grid-template-columns: 1fr; }
+  .vs { justify-self: center; }
+}
+@media (max-width: 520px) {
+  .world { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+}
+
+/* crew cards */
+.crew { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.tcard { perspective: 1200px; aspect-ratio: 5 / 7; cursor: pointer; --c: var(--collector); --flip: 0deg; --rx: 0deg; --ry: 0deg; }
+.tcard.flipped { --flip: 180deg; }
+.tcard-inner {
+  position: relative; width: 100%; height: 100%; transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--flip)));
+  transition: transform .7s cubic-bezier(.2, .8, .2, 1);
+}
+/* follow the pointer quickly, but keep the slow ease while a flip is running */
+.tcard.tilting .tcard-inner { transition: transform .15s ease-out; }
+.tcard.flipping .tcard-inner { transition: transform .7s cubic-bezier(.2, .8, .2, 1); }
+.face {
+  position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  border-radius: 20px; padding: 9px;
+  background: linear-gradient(145deg, #ffe08a, #c98a1a 45%, #ffd56a 70%, #a8650a);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, .5);
+}
+.face-in {
+  position: relative; height: 100%; border-radius: 13px; overflow: hidden;
+  display: flex; flex-direction: column;
+  background: radial-gradient(90% 60% at 50% 42%, color-mix(in srgb, var(--c) 60%, transparent), transparent 70%), linear-gradient(#18216b, #0a0f36);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .35);
+}
+.face-in::after {
+  /* holo sheen that follows the pointer */
+  content: ''; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity .3s;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .35) 45%, rgba(120, 220, 255, .25) 52%, transparent 65%);
+  background-size: 250% 250%; background-position: var(--sx, 50%) 50%;
+}
+.tcard:hover .face-in::after { opacity: 1; }
+.tc-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px 0; }
+.tc-name { font: 400 clamp(17px, 1.8vw, 22px)/1 var(--display); letter-spacing: .02em; }
+.tc-type { font: 900 10px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; background: rgba(0, 0, 0, .35); color: #fff; }
+.tc-art { flex: 1; position: relative; min-height: 0; }
+.tc-art img { position: absolute; inset: 6px 12px; width: calc(100% - 24px); height: calc(100% - 12px); object-fit: contain; filter: drop-shadow(0 12px 16px rgba(0, 0, 0, .45)); }
+.tc-tag { margin: 0 12px 10px; padding: 10px; border-radius: 10px; text-align: center; background: rgba(4, 7, 26, .6); font: 400 clamp(18px, 2vw, 23px)/1 var(--display); color: var(--gold-hi); }
+.tc-hint { text-align: center; font: 800 11px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .55); padding-bottom: 12px; }
+.back { transform: rotateY(180deg); }
+.back .face-in { padding: 18px; gap: 10px; background: radial-gradient(80% 50% at 50% 0%, color-mix(in srgb, var(--c) 45%, transparent), transparent 70%), linear-gradient(#141d5e, #090d30); }
+.back h3 { font-size: clamp(20px, 2vw, 26px); }
+.back .tc-type { align-self: flex-start; }
+.back p { margin: 0; font-size: 14.5px; line-height: 1.5; color: #dfe4ff; }
+.stats { margin-top: auto; display: grid; gap: 7px; }
+.stat { display: grid; grid-template-columns: 82px 1fr; align-items: center; gap: 8px; font: 800 12px/1 var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.stat i { height: 8px; border-radius: 99px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.stat i::before { content: ''; display: block; height: 100%; width: var(--v); border-radius: inherit; background: linear-gradient(90deg, var(--c), #fff); }
+@media (max-width: 980px) {
+  .crew { grid-template-columns: repeat(4, minmax(240px, 1fr)); overflow-x: auto; scroll-snap-type: x mandatory; padding: 6px 16px 26px; margin: 0 -16px; scrollbar-width: none; }
+  .crew::-webkit-scrollbar { display: none; }
+  .tcard { scroll-snap-align: center; }
+}
+@media (max-width: 560px) { .crew { grid-template-columns: repeat(4, 78%); } }
+
+/* quiz */
+.quiz {
+  max-width: 820px; margin: 0 auto; border-radius: 28px; padding: clamp(22px, 4vw, 44px);
+  background: var(--panel); box-shadow: inset 0 0 0 1px var(--line), 0 30px 70px rgba(0, 0, 0, .35);
+}
+.q-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+.dots { display: flex; gap: 7px; }
+.dots i { width: 28px; height: 6px; border-radius: 9px; background: rgba(255, 255, 255, .14); transition: background .3s; }
+.dots i.on { background: var(--gold); }
+.q-count { font: 900 13px/1 var(--body); letter-spacing: .14em; color: var(--muted); }
+.q-text { font: 800 clamp(21px, 2.8vw, 28px)/1.3 var(--body); margin: 0 0 22px; }
+.answers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.answer {
+  text-align: left; border: 0; cursor: pointer; padding: 16px 18px; border-radius: 16px;
+  background: rgba(255, 255, 255, .06); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .12);
+  font-weight: 700; font-size: 16px; line-height: 1.35; transition: background .2s, transform .15s, box-shadow .2s;
+}
+.answer:hover { background: rgba(255, 200, 61, .12); box-shadow: inset 0 0 0 1.5px var(--gold); transform: translateY(-2px); }
+.answer b { color: var(--gold); margin-right: 8px; font-weight: 900; }
+@media (max-width: 640px) { .answers { grid-template-columns: 1fr; } }
+.result { display: grid; grid-template-columns: 230px 1fr; gap: 30px; align-items: center; }
+.result-art { border-radius: 20px; padding: 14px; background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--c) 55%, transparent), transparent 70%); }
+.result-art img { width: 100%; animation: pop .6s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes pop { from { transform: scale(.4) rotate(-8deg); opacity: 0; } }
+.result small { font: 900 13px/1 var(--body); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.result h3 { font-size: clamp(36px, 5vw, 52px); margin: 8px 0 4px; color: var(--gold-hi); text-shadow: 0 3px 0 #8a4a00; }
+.result .said { font: 400 24px/1 var(--display); color: var(--c); margin: 0 0 12px; }
+.result p { margin: 0 0 20px; color: #dfe4ff; }
+.result .cta-row { justify-content: flex-start; margin-top: 0; }
+@media (max-width: 640px) { .result { grid-template-columns: 1fr; text-align: center; } .result-art { width: 200px; margin: 0 auto; } .result .cta-row { justify-content: center; } }
+
+/* themes */
+.themes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; counter-reset: th; }
+.theme {
+  position: relative; border-radius: var(--radius); padding: 18px 18px 22px; background: var(--panel);
+  box-shadow: inset 0 0 0 1px var(--line); display: flex; flex-direction: column;
+}
+.theme:not(:last-child)::after {
+  content: '➜'; position: absolute; right: -19px; top: 86px; z-index: 2; color: var(--gold); font-size: 22px;
+  width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: #0c1340; box-shadow: 0 0 0 2px var(--line);
+}
+.theme-art { height: 150px; border-radius: 14px; overflow: hidden; display: grid; place-items: center; background: radial-gradient(circle, rgba(255, 200, 61, .18), transparent 70%), #0a0f36; }
+.theme-art img.cover { width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+.theme-art img.fit { max-height: 130px; width: auto; }
+.theme h3 { margin-top: 16px; color: var(--gold-hi); }
+.theme h3::before { counter-increment: th; content: '0' counter(th) ' '; color: var(--muted); font-size: .7em; }
+.theme .sub { font-weight: 900; color: #fff; margin: 2px 0 8px; }
+.theme p { margin: 0; color: #cfd5f5; font-size: 15px; }
+.theme q { display: block; margin-top: auto; padding-top: 14px; font: 400 15px/1.2 var(--display); letter-spacing: .03em; color: var(--gold); quotes: none; }
+@media (max-width: 980px) {
+  .themes { grid-template-columns: 1fr 1fr; }
+  .theme:not(:last-child)::after { display: none; }
+}
+@media (max-width: 560px) { .themes { grid-template-columns: 1fr; } }
+.eyes { display: flex; gap: 16px; }
+.eye {
+  width: 64px; height: 40px; border-radius: 50%; background: #fff; position: relative; overflow: hidden;
+  box-shadow: 0 0 0 4px #1a0f3a, 0 0 30px rgba(155, 92, 255, .6);
+}
+.eye::before { content: ''; position: absolute; inset: 0 0 auto; height: 46%; background: var(--scalper); z-index: 2; border-bottom: 4px solid #1a0f3a; transform-origin: 50% 0; }
+.eye + .eye::before { transform: rotate(-12deg); }
+.eye:first-child::before { transform: rotate(12deg); }
+.eye::after { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #1a0f3a; top: 14px; left: 22px; animation: glance 5s ease-in-out infinite; }
+@keyframes glance { 0%, 20% { transform: translateX(-12px); } 40%, 60% { transform: translateX(12px); } 80%, 100% { transform: translateX(-12px); } }
+
+/* packs */
+.packs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px, 6vw, 70px); align-items: center; }
+.stage { position: relative; display: grid; place-items: center; min-height: 500px; }
+.pack {
+  position: relative; width: 250px; aspect-ratio: 5 / 8; border: 0; cursor: pointer; padding: 0;
+  border-radius: 14px 14px 18px 18px; z-index: 2;
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, .0) 30%, rgba(255, 255, 255, .35) 45%, rgba(255, 255, 255, 0) 60%),
+    conic-gradient(from 200deg at 50% 50%, #3aa8ff, #9b5cff, #ff6fb5, #ffc83d, #8bd43b, #3aa8ff);
+  background-size: 250% 250%, 100% 100%;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .55), inset 0 0 0 3px rgba(255, 255, 255, .35);
+  animation: sheen 4s linear infinite;
+  transition: transform .3s, opacity .4s;
+}
+@keyframes sheen { from { background-position: 150% 0, 0 0; } to { background-position: -50% 0, 0 0; } }
+.pack::before, .pack::after { content: ''; position: absolute; left: 0; right: 0; height: 14px; background: repeating-linear-gradient(90deg, rgba(0, 0, 0, .25) 0 6px, transparent 6px 12px); }
+.pack::before { top: 0; border-radius: 14px 14px 0 0; }
+.pack::after { bottom: 0; border-radius: 0 0 18px 18px; }
+.pack-face {
+  position: absolute; inset: 26px 16px; border-radius: 12px; display: grid; place-items: center; align-content: center; gap: 10px;
+  background: radial-gradient(circle at 50% 40%, #1d2a86, #0a0f36 75%); box-shadow: inset 0 0 0 3px var(--gold);
+}
+.pack-face img { width: 96px; height: 96px; border-radius: 50%; box-shadow: 0 0 0 3px var(--gold), 0 10px 26px rgba(0, 0, 0, .5); }
+.pack-face strong { font: 400 22px/1 var(--display); color: var(--gold-hi); letter-spacing: .03em; }
+.pack-face span { font: 900 11px/1 var(--body); letter-spacing: .2em; color: var(--muted); }
+.pack:hover { transform: translateY(-6px) rotate(-1.5deg); }
+.pack.shake { animation: shake .55s ease-in-out; }
+@keyframes shake { 20% { transform: rotate(-5deg); } 40% { transform: rotate(5deg); } 60% { transform: rotate(-4deg); } 80% { transform: rotate(3deg); } }
+.pack.gone { opacity: 0; transform: translateY(60px) scale(.9); pointer-events: none; }
+.pull { position: absolute; width: 270px; z-index: 3; opacity: 0; transform: translateY(80px) scale(.8); pointer-events: none; transition: opacity .4s, transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+.pull.up { opacity: 1; transform: none; pointer-events: auto; }
+.pull .tcard { cursor: default; }
+.pull.myth .face { box-shadow: 0 0 0 2px #fff6c8, 0 0 60px rgba(255, 200, 61, .85), 0 24px 50px rgba(0, 0, 0, .5); }
+.card-back .face-in { display: grid; place-items: center; background: repeating-linear-gradient(45deg, rgba(255, 200, 61, .07) 0 12px, transparent 12px 24px), radial-gradient(circle, #1d2a86, #0a0f36 75%); }
+.card-back img { width: 46%; filter: drop-shadow(0 10px 20px rgba(0, 0, 0, .5)); }
+.rug-note { position: absolute; inset: auto 0 16px; text-align: center; font: 400 22px/1 var(--display); color: #fff; text-shadow: 0 3px 0 #000; }
+.spark { position: absolute; z-index: 4; color: var(--gold-hi); font-size: 22px; pointer-events: none; animation: spark 1.1s ease-out forwards; }
+@keyframes spark { from { transform: translate(0, 0) scale(.4); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(1.2); opacity: 0; } }
+.odds { list-style: none; padding: 0; margin: 24px 0; display: grid; gap: 10px; }
+.odds li { display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center; padding: 10px 14px; border-radius: 14px; background: rgba(255, 255, 255, .05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); font-weight: 800; }
+.odds img { width: 44px; height: 44px; object-fit: contain; }
+.odds em { font-style: normal; color: var(--muted); font-weight: 700; font-size: 14px; }
+.odds b { color: var(--gold); }
+.pull-log { display: flex; flex-wrap: wrap; gap: 10px 22px; font-weight: 800; color: var(--muted); }
+.pull-log b { color: #fff; }
+.pull-msg { min-height: 1.6em; font: 400 26px/1.1 var(--display); color: var(--gold-hi); margin: 0 0 6px; }
+@media (max-width: 860px) {
+  .packs { grid-template-columns: 1fr; }
+  .stage { min-height: 440px; order: 2; }
+  .pack { width: 210px; }
+  .pull { width: 240px; }
+}
+
+/* token */
+.facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.fact { border-radius: 18px; padding: 20px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); min-width: 0; }
+.fact small { display: block; font: 900 12px/1 var(--body); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.fact strong { display: block; margin-top: 10px; font: 400 26px/1.1 var(--display); color: #fff; letter-spacing: .02em; overflow-wrap: anywhere; }
+.fact.ca { grid-column: span 2; }
+.fact.ca .row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.fact.ca code { font: 700 16px/1.3 ui-monospace, Consolas, monospace; overflow-wrap: anywhere; flex: 1; min-width: 0; }
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 42px; counter-reset: st; }
+.step { border-radius: 18px; padding: 22px; background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.step::before { counter-increment: st; content: counter(st); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--gold); color: #2a1600; font: 400 22px/1 var(--display); margin-bottom: 14px; }
+.step h3 { font-size: 21px; }
+.step p { margin: 8px 0 0; color: #cfd5f5; font-size: 15px; }
+.warn { margin: 26px auto 0; max-width: 760px; text-align: center; color: var(--muted); font-size: 15px; }
+.warn b { color: #fff; }
+.buy-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 32px; }
+@media (max-width: 900px) {
+  .facts, .steps { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 520px) {
+  .facts, .steps { grid-template-columns: 1fr; }
+  .fact.ca { grid-column: auto; }
+}
+
+/* community */
+.join {
+  position: relative; overflow: hidden; border-radius: 32px; padding: clamp(30px, 6vw, 64px);
+  display: grid; grid-template-columns: 1fr 1.1fr; gap: 30px; align-items: center;
+  background: radial-gradient(60% 80% at 20% 60%, rgba(255, 184, 28, .35), transparent 70%), linear-gradient(135deg, #1b2780, #0b1140);
+  box-shadow: inset 0 0 0 1px var(--line), 0 40px 80px rgba(0, 0, 0, .4);
+}
+.join img { width: 100%; max-width: 440px; margin: 0 auto; filter: drop-shadow(0 20px 30px rgba(0, 0, 0, .5)); }
+.join p { color: #dfe4ff; font-size: 18px; margin: 16px 0 26px; }
+.join .cta-row { justify-content: flex-start; }
+@media (max-width: 820px) { .join { grid-template-columns: 1fr; text-align: center; } .join .cta-row { justify-content: center; } .join img { max-width: 300px; } }
+
+/* footer */
+footer { padding: 54px 0 40px; border-top: 1px solid var(--line); background: #050818; }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px; align-items: center; }
+.foot-links { display: flex; gap: 12px; }
+.icon-btn { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(255, 255, 255, .07); transition: background .2s; }
+.icon-btn:hover { background: rgba(255, 255, 255, .15); }
+.icon-btn svg { width: 20px; height: 20px; }
+.disclaimer { margin-top: 28px; color: #7e87b5; font-size: 13.5px; line-height: 1.6; max-width: 900px; }
+.toast {
+  position: fixed; left: 50%; bottom: 24px; z-index: 80; transform: translate(-50%, 30px); opacity: 0;
+  padding: 12px 20px; border-radius: 14px; background: #fff; color: #10153d; font-weight: 900; box-shadow: 0 16px 40px rgba(0, 0, 0, .4);
+  transition: opacity .25s, transform .25s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- 3D intro ---------- */
+.intro { display: none; }
+html.intro-on { overflow: hidden; }
+html.intro-on .intro, .intro.out { display: block; position: fixed; inset: 0 auto 0 0; width: 100vw; z-index: 100; background: #050818; transition: opacity .9s ease; }
+.intro.out { opacity: 0; pointer-events: none; }
+.intro canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.intro-load { position: absolute; inset: 0; display: grid; place-items: center; transition: opacity .4s; pointer-events: none; }
+.intro-load img { width: 64px; animation: coin-spin 1.1s linear infinite; }
+@keyframes coin-spin { 50% { transform: scaleX(.12); } }
+.intro.ready .intro-load { opacity: 0; }
+.intro-cap {
+  position: absolute; left: 16px; right: 16px; bottom: 15%; margin: 0; text-align: center; opacity: 0; pointer-events: none;
+  font: 400 clamp(26px, 4.2vw, 54px)/1.05 var(--display); letter-spacing: .02em; color: #fff;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, .6), 0 12px 30px rgba(0, 0, 0, .8);
+}
+.intro-cap.big { bottom: auto; top: 50%; margin-top: -.5em; font-size: clamp(46px, 8.5vw, 116px); color: var(--gold-hi); text-shadow: 0 4px 0 #b86a00, 0 8px 0 #4a2500, 0 24px 50px rgba(0, 0, 0, .8); }
+.intro-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, .08); }
+.intro-bar i { display: block; height: 100%; transform-origin: 0 50%; transform: scaleX(0); background: var(--gold); }
+.intro-skip {
+  position: absolute; right: 16px; bottom: 22px; border: 0; cursor: pointer; padding: 10px 18px; border-radius: 999px;
+  background: rgba(255, 255, 255, .1); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .25); backdrop-filter: blur(8px);
+  font: 800 14px/1 var(--body); color: #fff; letter-spacing: .04em;
+}
+.intro-skip:hover { background: rgba(255, 255, 255, .2); }
+/* the hero waits under the intro, then enters in a stagger when it fades */
+.hero-copy > *, .mate, .floaters { transition: opacity .7s ease, transform .9s cubic-bezier(.2, .8, .2, 1); }
+html.intro-on .hero-copy > * { opacity: 0; transform: translateY(26px); }
+html.intro-on .mate { opacity: 0; transform: translateY(70%); }
+html.intro-on .floaters { opacity: 0; }
+html.intro-on .hero-logo { animation: none; }
+.hero-copy > :nth-child(2) { transition-delay: .08s; }
+.hero-copy > :nth-child(3) { transition-delay: .16s; }
+.hero-copy > :nth-child(4) { transition-delay: .24s; }
+.hero-copy > :nth-child(5) { transition-delay: .32s; }
+.mate:nth-child(1) { transition-delay: .35s; }
+.mate:nth-child(2) { transition-delay: .45s; }
+.mate:nth-child(3) { transition-delay: .55s; }
+.mate:nth-child(4) { transition-delay: .65s; }
+.replay { background: none; border: 0; padding: 0; cursor: pointer; font: 800 14px/1 var(--body); color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+.replay:hover { color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="intro" id="intro">
+  <canvas id="intro-canvas" aria-hidden="true"></canvas>
+  <div class="intro-load" aria-hidden="true"><img src="img/coin.webp" alt=""></div>
+  <p class="intro-cap" id="intro-cap" aria-hidden="true"></p>
+  <div class="intro-bar" aria-hidden="true"><i id="intro-bar"></i></div>
+  <button class="intro-skip" id="intro-skip" type="button">Skip intro</button>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-x" viewBox="0 0 24 24"><path fill="currentColor" d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L2.9 2h6.4l4.4 5.8L18.9 2Zm-1.1 18.2h1.7L8.3 3.7H6.5l11.3 16.5Z"/></symbol>
+  <symbol id="i-tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.2 13 1.4 11.5c-1-.3-1-1 .2-1.5L20.5 2.8c.9-.3 1.6.2 1.4 1.5Z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 9h10v12H9zM5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18M7 15l4-4 3 3 6-7"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+</svg>
+
+<nav class="nav" id="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="img/avatar.webp" alt="" width="38" height="38">$UNCATCHABLE</a>
+    <ul class="nav-links">
+      <li><a href="#story">Story</a></li>
+      <li><a href="#crew">The Crew</a></li>
+      <li><a href="#quiz">Which one?</a></li>
+      <li><a href="#packs">Rip a pack</a></li>
+      <li><a href="#token">Token</a></li>
+    </ul>
+    <a class="btn btn-gold" data-link="telegram" href="#" target="_blank" rel="noopener"><svg><use href="#i-tg"/></svg><span>Join<span class="long"> the chase</span></span></a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="floaters" aria-hidden="true">
+    <div class="floater" style="left:6%;top:24%;--r:-14deg;--t:9s"><div class="mini-card" style="--s:70px"></div></div>
+    <div class="floater" style="left:16%;top:58%;--r:10deg;--t:7s;--d:-2s"><img class="coin" src="img/coin.webp" alt="" style="--s:64px"></div>
+    <div class="floater" style="right:7%;top:7%;--r:12deg;--t:8s;--d:-1s"><div class="mini-card" style="--s:82px"></div></div>
+    <div class="floater" style="right:5%;top:68%;--r:-8deg;--t:10s;--d:-4s"><img class="coin" src="img/coin.webp" alt="" style="--s:52px"></div>
+    <div class="floater" style="left:28%;top:12%;--r:6deg;--t:11s;--d:-3s"><img class="coin" src="img/coin.webp" alt="" style="--s:34px"></div>
+    <div class="floater" style="right:30%;top:9%;--r:-18deg;--t:9s;--d:-5s"><div class="mini-card" style="--s:44px"></div></div>
+  </div>
+
+  <div class="hero-inner wrap">
+    <img class="hero-logo" src="img/logo.webp" alt="$UNCATCHABLE logo: The Collector leaping for a golden card" width="1100" height="787">
+    <div class="hero-copy">
+    <span class="pill"><i></i>Launching soon on Solana</span>
+    <h1 class="tagline"><span class="sr-only">$UNCATCHABLE: </span>Catch nothing.<br>Hold everything.</h1>
+    <p class="lede">A meme universe where card collectors and crypto holders chase the one that always gets away.</p>
+    <div class="ca-box">
+      <b>CA</b><code data-ca>Soon</code>
+      <button class="copy" type="button" data-copy-ca><svg><use href="#i-copy"/></svg>Copy</button>
+    </div>
+    <div class="cta-row">
+      <a class="btn btn-gold" data-link="telegram" href="#" target="_blank" rel="noopener"><svg><use href="#i-tg"/></svg>Join Telegram</a>
+      <a class="btn btn-ghost" data-link="x" href="#" target="_blank" rel="noopener"><svg><use href="#i-x"/></svg>Follow on X</a>
+    </div>
+    </div>
+  </div>
+
+  <div class="curb">
+    <div class="curb-row">
+      <button class="mate" type="button" data-goto="collector"><span class="say">Just one.</span><img src="img/collector.webp" alt="The Collector" width="483" height="512"></button>
+      <button class="mate" type="button" data-goto="holder"><span class="say">Still holding.</span><img src="img/holder.webp" alt="The Holder" width="447" height="513"></button>
+      <button class="mate" type="button" data-goto="scalper"><span class="say">All of them.</span><img src="img/scalper.webp" alt="The Scalper" width="470" height="528"></button>
+      <button class="mate" type="button" data-goto="rugger"><span class="say">What rug?</span><img src="img/rugger.webp" alt="The Rugger" width="456" height="537"></button>
+    </div>
+    <div class="shelf"></div>
+  </div>
+</header>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>The Collector: Just one.</span><span>The Scalper: All of them.</span><span>The Holder: Still holding.</span><span>The Rugger: What rug?</span><span>The Myth: They do exist.</span>
+    <span>The Collector: Just one.</span><span>The Scalper: All of them.</span><span>The Holder: Still holding.</span><span>The Rugger: What rug?</span><span>The Myth: They do exist.</span>
+  </div>
+</div>
+
+<main>
+  <section class="section" id="story">
+    <div class="wrap">
+      <div class="story">
+        <div class="reveal">
+          <span class="kicker">The story</span>
+          <h2>One second<br>too late.</h2>
+          <blockquote>Some refresh the store page. Others refresh a chart. <em>Both know the feeling of being one second too late.</em></blockquote>
+          <p>$UNCATCHABLE is a meme universe where card collectors and crypto holders chase the one that always gets away. Four familiar personalities keep crossing paths in pursuit of something rare, and turn empty shelves, rug pulls, small wins and legendary finds into an ongoing rivalry.</p>
+          <p>Different obsessions. Same racing heartbeat.</p>
+        </div>
+        <div class="frame reveal">
+          <img src="img/scene.webp" alt="The Collector, The Holder, The Scalper and The Rugger sitting on a curb outside a card shop at dusk" width="1280" height="512" loading="lazy">
+          <span class="stamp">Sold out</span>
+        </div>
+      </div>
+
+      <div class="worlds">
+        <div class="world reveal">
+          <div class="duo"><img src="img/collector.webp" alt="" loading="lazy"><img src="img/scalper.webp" alt="" loading="lazy"></div>
+          <div><small>Trading cards</small><h3>The Hobby</h3><p>Empty shelves, sealed boxes and one card worth keeping.</p></div>
+        </div>
+        <div class="vs" aria-hidden="true">VS</div>
+        <div class="world reveal">
+          <div class="duo"><img src="img/holder.webp" alt="" loading="lazy"><img src="img/rugger.webp" alt="" loading="lazy"></div>
+          <div><small>Meme coins</small><h3>The Chain</h3><p>Green candles, red buttons and one coin worth believing in.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="crew">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="kicker">Four rivals. One chase.</span>
+        <h2>Meet the crew</h2>
+        <p>They all want the rarest find. None of them would exist without the others. Tap a card to flip it.</p>
+      </div>
+      <div class="crew" id="crew-cards"></div>
+    </div>
+  </section>
+
+  <section class="section" id="quiz">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="kicker">Five questions. No refunds.</span>
+        <h2>Which one are you?</h2>
+      </div>
+      <div class="quiz reveal" id="quiz-box" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="section alt" id="themes">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="kicker">Every chase, same loop</span>
+        <h2>The four acts</h2>
+        <p>Everything in $UNCATCHABLE runs on the same cycle. Different hobby, same ending.</p>
+      </div>
+      <div class="themes">
+        <article class="theme reveal">
+          <div class="theme-art"><img class="cover" src="img/shelf.webp" alt="An empty shelf with an Out of Stock sign" loading="lazy"></div>
+          <h3>The Chase</h3>
+          <div class="sub">Gone again.</div>
+          <p>The release-day rush, the checkout page that times out, one more store, one more tab. Every rumor feels like a clue.</p>
+          <q>This time will be different.</q>
+        </article>
+        <article class="theme reveal">
+          <div class="theme-art"><img class="fit" src="img/coin.webp" alt="A golden star coin" loading="lazy"></div>
+          <h3>The Catch</h3>
+          <div class="sub">Got one.</div>
+          <p>The pack you stop opening halfway. The early buy. Fourteen photos that all look the same, sent to the group chat.</p>
+          <q>"Maybe someday" becomes "I got one!"</q>
+        </article>
+        <article class="theme reveal">
+          <div class="theme-art"><div class="eyes" role="img" aria-label="Two suspicious eyes glancing sideways"><span class="eye"></span><span class="eye"></span></div></div>
+          <h3>The Realization</h3>
+          <div class="sub">We knew.</div>
+          <p>The knowing look between rivals. Everyone sees the schemes, and everyone keeps coming back one move ahead.</p>
+          <q>What would you do without us?</q>
+        </article>
+        <article class="theme reveal">
+          <div class="theme-art"><img class="fit" src="img/myth-card.webp" alt="The Myth, a graded Gem Mint 10 card" loading="lazy"></div>
+          <h3>The Myth</h3>
+          <div class="sub">They do exist.</div>
+          <p>The grail in somebody's attic. The moonshot everyone claims they spotted early. Every retelling makes it a little bigger.</p>
+          <q>They do exist!</q>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="packs">
+    <div class="wrap">
+      <div class="packs">
+        <div class="stage" id="stage">
+          <button class="pack" id="pack" type="button" aria-label="Rip open a booster pack">
+            <span class="pack-face"><img src="img/avatar.webp" alt=""><strong>$UNCATCHABLE</strong><span>BOOSTER · 1 CARD</span></span>
+          </button>
+          <div class="pull" id="pull"></div>
+        </div>
+        <div class="reveal">
+          <span class="kicker">Try your luck</span>
+          <h2>Rip a pack</h2>
+          <p style="color:var(--muted);font-size:18px">One card per pack. Odds are printed on the wrapper, just like the real thing. Some packs come back lighter than they should.</p>
+          <p class="pull-msg" id="pull-msg" aria-live="polite"></p>
+          <ul class="odds" id="odds"></ul>
+          <div class="pull-log"><span>Packs ripped: <b id="n-packs">0</b></span><span>Myths caught: <b id="n-myths">0</b></span><span>Times rugged: <b id="n-rugs">0</b></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="token">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="kicker">$UNCATCHABLE on Solana</span>
+        <h2>The token</h2>
+        <p id="token-note">Launch details drop in the Telegram announcements channel first. Until then, there is nothing to buy, so anyone selling it is The Rugger.</p>
+      </div>
+      <div class="facts reveal" id="facts">
+        <div class="fact"><small>Ticker</small><strong>$UNCATCHABLE</strong></div>
+        <div class="fact"><small>Chain</small><strong>Solana</strong></div>
+        <div class="fact ca"><small>Contract address</small><div class="row"><code data-ca>Soon</code><button class="copy" type="button" data-copy-ca><svg><use href="#i-copy"/></svg>Copy</button></div></div>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><h3>Get a wallet</h3><p>Install Phantom or Solflare and write the seed phrase down somewhere offline.</p></div>
+        <div class="step reveal"><h3>Load SOL</h3><p>Buy SOL on an exchange and send it to your wallet address.</p></div>
+        <div class="step reveal"><h3>Swap</h3><p>Open Jupiter, paste the official CA from this page and swap SOL for $UNCATCHABLE.</p></div>
+        <div class="step reveal"><h3>Hold</h3><p>Catch nothing. Hold everything. Then tell the group chat.</p></div>
+      </div>
+      <div class="buy-row">
+        <a class="btn btn-gold" data-link="buy" href="#" target="_blank" rel="noopener" aria-disabled="true"><svg><use href="#i-bolt"/></svg><span>Buy: soon</span></a>
+        <a class="btn btn-ghost" data-link="chart" href="#" target="_blank" rel="noopener" aria-disabled="true"><svg><use href="#i-chart"/></svg>Chart</a>
+      </div>
+      <p class="warn">Only trust the CA posted <b>here</b>, on <b>@UNCATCHABLECOIN</b> and in the <b>Telegram announcements channel</b>. Admins will never DM you first.</p>
+    </div>
+  </section>
+
+  <section class="section" id="community">
+    <div class="wrap">
+      <div class="join reveal">
+        <img src="img/myth.webp" alt="The Myth, a golden fox curled up and smiling" loading="lazy" width="560" height="469">
+        <div>
+          <span class="kicker">Community</span>
+          <h2>Join the chase</h2>
+          <p>Blurry pack photos, chart screenshots with far too many exclamation marks, and a launch announcement that should be out soon.</p>
+          <div class="cta-row">
+            <a class="btn btn-gold" data-link="telegram" href="#" target="_blank" rel="noopener"><svg><use href="#i-tg"/></svg>Telegram chat</a>
+            <a class="btn btn-ghost" data-link="channel" href="#" target="_blank" rel="noopener"><svg><use href="#i-tg"/></svg>Announcements</a>
+            <a class="btn btn-ghost" data-link="x" href="#" target="_blank" rel="noopener"><svg><use href="#i-x"/></svg>X</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <a class="brand" href="#top"><img src="img/avatar.webp" alt="" width="38" height="38" loading="lazy">$UNCATCHABLE</a>
+      <span style="font:400 20px/1 var(--display);color:var(--gold)">Catch nothing. Hold everything.</span>
+      <a class="replay" href="?intro=1">Replay intro</a>
+      <div class="foot-links">
+        <a class="icon-btn" data-link="x" href="#" target="_blank" rel="noopener" aria-label="$UNCATCHABLE on X"><svg><use href="#i-x"/></svg></a>
+        <a class="icon-btn" data-link="telegram" href="#" target="_blank" rel="noopener" aria-label="$UNCATCHABLE Telegram chat"><svg><use href="#i-tg"/></svg></a>
+      </div>
+    </div>
+    <p class="disclaimer">$UNCATCHABLE is a meme coin made for entertainment. It has no intrinsic value, no team promises and no expectation of financial return. Nothing on this site is financial advice. Crypto is volatile and you can lose everything you put in, so only use money you can afford to lose and do your own research. The pack opening on this page is a free game with no prizes. © 2026 $UNCATCHABLE. Characters and artwork belong to $UNCATCHABLE.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+// Characters, shared by the crew cards, the quiz and the packs
+const CREW = {
+  collector: {
+    name: 'The Collector', said: 'Just one.', world: 'Hobby', color: 'var(--collector)', img: 'img/collector.webp',
+    bio: 'Wants one card worth keeping. Camps outside before sunrise, sleeves everything twice and takes fourteen photos that all look the same.',
+    stats: [['Patience', 92], ['Luck', 31], ['Sleeves', 100]]
+  },
+  holder: {
+    name: 'The Holder', said: 'Still holding.', world: 'Chain', color: 'var(--holder)', img: 'img/holder.webp',
+    bio: 'Looking for a coin she can believe in, and a community that gets the joke without a long explanation. Zooms out. Then zooms out again.',
+    stats: [['Conviction', 100], ['Paper hands', 4], ['GMs said', 88]]
+  },
+  scalper: {
+    name: 'The Scalper', said: 'All of them.', world: 'Hobby', color: 'var(--scalper)', img: 'img/scalper.webp',
+    bio: 'Wants every box before the retail doors open. If the shelf is empty on release day, check the backpack. And the car. And the spare room.',
+    stats: [['Speed', 97], ['Boxes', 100], ['Shame', 6]]
+  },
+  rugger: {
+    name: 'The Rugger', said: 'What rug?', world: 'Chain', color: 'var(--rugger)', img: 'img/rugger.webp',
+    bio: 'Wants to pull the floor out from under the whole occasion and somehow look innocent afterward. He is already planning something.',
+    stats: [['Charm', 90], ['Alibis', 95], ['Rugs owned', 100]]
+  },
+  myth: {
+    name: 'The Myth', said: 'They do exist.', world: 'Grail', color: 'var(--myth)', img: 'img/myth-card.webp',
+    bio: 'The grail card in somebody\'s attic. The moonshot everyone claims they spotted early. Somebody knows somebody who can prove it.',
+    stats: [['Rarity', 100], ['Sightings', 3], ['Gem mint', 100]]
+  }
+};
+
+function cardHTML(id, { flippable = true } = {}) {
+  const c = CREW[id];
+  const stats = c.stats.map(([k, v]) => `<span class="stat">${k}<i style="--v:${v}%"></i></span>`).join('');
+  return `
+    <div class="tcard" style="--c:${c.color}" data-id="${id}" ${flippable ? 'role="button" tabindex="0" aria-pressed="false"' : ''} aria-label="${c.name}: ${c.said}">
+      <div class="tcard-inner">
+        <div class="face front"><div class="face-in">
+          <div class="tc-top"><span class="tc-name">${c.name}</span><span class="tc-type">${c.world}</span></div>
+          <div class="tc-art"><img src="${c.img}" alt="" loading="lazy"></div>
+          <div class="tc-tag">${c.said}</div>
+          ${flippable ? '<div class="tc-hint">Tap to flip</div>' : ''}
+        </div></div>
+        <div class="face back"><div class="face-in">
+          <h3>${c.name}</h3>
+          <span class="tc-type">${c.world === 'Hobby' ? 'Trading cards · The Hobby' : c.world === 'Chain' ? 'Meme coins · The Chain' : 'Gem mint 10'}</span>
+          <p>${c.bio}</p>
+          <div class="stats">${stats}</div>
+        </div></div>
+      </div>
+    </div>`;
+}
+
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finePointer = matchMedia('(pointer: fine)').matches;
+
+// Pointer tilt and holo sheen on a card
+function tilt(card) {
+  if (!finePointer || reduceMotion) return;
+  card.addEventListener('pointerenter', () => card.classList.add('tilting'));
+  card.addEventListener('pointermove', (e) => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+    card.style.setProperty('--ry', `${x * 16}deg`);
+    card.style.setProperty('--rx', `${-y * 12}deg`);
+    card.style.setProperty('--sx', `${(x + .5) * 100}%`);
+  });
+  card.addEventListener('pointerleave', () => {
+    card.classList.remove('tilting');
+    card.style.setProperty('--ry', '0deg');
+    card.style.setProperty('--rx', '0deg');
+  });
+}
+
+// ---------- crew ----------
+const crewBox = document.getElementById('crew-cards');
+crewBox.innerHTML = ['collector', 'holder', 'scalper', 'rugger'].map((id) => cardHTML(id)).join('');
+function setFlip(card, on) {
+  card.classList.add('flipping');
+  card.classList.toggle('flipped', on);
+  card.setAttribute('aria-pressed', on);
+  clearTimeout(card.flipTimer);
+  card.flipTimer = setTimeout(() => card.classList.remove('flipping'), 700);
+}
+crewBox.querySelectorAll('.tcard').forEach((card) => {
+  const flip = () => setFlip(card, !card.classList.contains('flipped'));
+  card.addEventListener('click', flip);
+  card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+  card.classList.add('reveal');
+  tilt(card);
+});
+document.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => {
+  const card = crewBox.querySelector(`[data-id="${b.dataset.goto}"]`);
+  document.getElementById('crew').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+  // On narrow screens the cards sit in a sideways scroller: bring this one to the middle
+  crewBox.scrollTo({ left: card.offsetLeft - crewBox.offsetLeft - (crewBox.clientWidth - card.offsetWidth) / 2 });
+  setTimeout(() => setFlip(card, true), 700);
+}));
+
+// ---------- quiz ----------
+const QUIZ = [
+  ['Release day, 6:58 AM. The shelf is empty. You…', [
+    ['collector', 'Drive to one more store. Then one more.'],
+    ['scalper', 'Smile. You cleared it at 6:57.'],
+    ['holder', 'Shrug. You are still holding from last time.'],
+    ['rugger', 'Put up a "restock soon" sign and sell the sign.']]],
+  ['Someone in the group chat says they pulled a grail. You…', [
+    ['collector', 'Ask for fourteen photos and a sleeve check.'],
+    ['scalper', 'Ask how many boxes they have left.'],
+    ['holder', 'Congratulate them. Small wins are still wins.'],
+    ['rugger', 'Offer to hold it for them. For safety.']]],
+  ['The chart drops 40% in an hour. You…', [
+    ['collector', 'Did not notice. You were sorting binders.'],
+    ['holder', 'Zoom out. Still holding.'],
+    ['scalper', 'Buy the dip and list it at 3x.'],
+    ['rugger', 'Post "devs are cooking" and log off.']]],
+  ['Your dream find is…', [
+    ['collector', 'The one card that completes the set.'],
+    ['holder', 'A coin with a community that gets the joke.'],
+    ['scalper', 'Every box. Before the doors open.'],
+    ['rugger', 'Whatever is under everyone else\'s feet.']]],
+  ['Your most-used phrase is…', [
+    ['collector', '"Do you have any more in the back?"'],
+    ['holder', '"GM. Still here."'],
+    ['scalper', '"Limit one per customer? Says who?"'],
+    ['rugger', '"Trust me."']]]
+];
+const quizBox = document.getElementById('quiz-box');
+let qi = 0, tally = {};
+
+function shuffle(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function showQuestion() {
+  const [text, answers] = QUIZ[qi];
+  const dots = QUIZ.map((_, i) => `<i class="${i <= qi ? 'on' : ''}"></i>`).join('');
+  quizBox.innerHTML = `
+    <div class="q-meta"><div class="dots">${dots}</div><span class="q-count">${qi + 1} / ${QUIZ.length}</span></div>
+    <p class="q-text">${text}</p>
+    <div class="answers">${shuffle(answers).map(([id, t], i) => `<button class="answer" type="button" data-id="${id}"><b>${'ABCD'[i]}</b>${t}</button>`).join('')}</div>`;
+  quizBox.querySelectorAll('.answer').forEach((b) => b.addEventListener('click', () => {
+    tally[b.dataset.id] = (tally[b.dataset.id] || 0) + 1;
+    tally.last = b.dataset.id;
+    qi++;
+    qi < QUIZ.length ? showQuestion() : showResult();
+  }));
+}
+
+function showResult() {
+  const top = Math.max(...['collector', 'holder', 'scalper', 'rugger'].map((k) => tally[k] || 0));
+  const tied = ['collector', 'holder', 'scalper', 'rugger'].filter((k) => (tally[k] || 0) === top);
+  const id = tied.includes(tally.last) ? tally.last : tied[0];
+  const c = CREW[id];
+  const text = `I'm ${c.name.toUpperCase()}. ${c.said}\n\nWhich one are you? $UNCATCHABLE @UNCATCHABLECOIN`;
+  const url = siteUrl();
+  const share = `https://x.com/intent/post?text=${encodeURIComponent(text)}${url ? `&url=${encodeURIComponent(url + '#quiz')}` : ''}`;
+  quizBox.innerHTML = `
+    <div class="result" style="--c:${c.color}">
+      <div class="result-art"><img src="${c.img}" alt="${c.name}"></div>
+      <div>
+        <small>You are</small>
+        <h3>${c.name}</h3>
+        <p class="said">${c.said}</p>
+        <p>${c.bio}</p>
+        <div class="cta-row">
+          <a class="btn btn-gold" href="${share}" target="_blank" rel="noopener"><svg><use href="#i-x"/></svg>Share on X</a>
+          <button class="btn btn-ghost" type="button" id="retake">Take it again</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('retake').addEventListener('click', () => { qi = 0; tally = {}; showQuestion(); });
+}
+showQuestion();
+
+// ---------- packs ----------
+const ODDS = [
+  ['collector', 27, ''], ['holder', 27, ''], ['scalper', 24, ''],
+  ['rugger', 18, 'pack comes back empty'], ['myth', 4, 'gem mint 10']
+];
+document.getElementById('odds').innerHTML = ODDS.map(([id, p, note]) =>
+  `<li><img src="${id === 'myth' ? 'img/myth.webp' : CREW[id].img}" alt="" loading="lazy"><span>${CREW[id].name}${note ? ` <em>· ${note}</em>` : ''}</span><b>${p}%</b></li>`).join('');
+
+const store = {
+  get() { try { return JSON.parse(localStorage.getItem('uncatchable-pulls')) || { packs: 0, myths: 0, rugs: 0 }; } catch { return { packs: 0, myths: 0, rugs: 0 }; } },
+  set(v) { try { localStorage.setItem('uncatchable-pulls', JSON.stringify(v)); } catch { /* private mode: counts just reset */ } }
+};
+let pulls = store.get();
+function showPulls() {
+  document.getElementById('n-packs').textContent = pulls.packs;
+  document.getElementById('n-myths').textContent = pulls.myths;
+  document.getElementById('n-rugs').textContent = pulls.rugs;
+}
+showPulls();
+
+const pack = document.getElementById('pack');
+const pull = document.getElementById('pull');
+const pullMsg = document.getElementById('pull-msg');
+const stage = document.getElementById('stage');
+const wait = (ms) => new Promise((r) => setTimeout(r, reduceMotion ? 0 : ms));
+
+function roll() {
+  let n = Math.random() * 100;
+  for (const [id, p] of ODDS) { if ((n -= p) < 0) return id; }
+  return 'collector';
+}
+
+function sparks(count) {
+  if (reduceMotion) return;
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('span');
+    s.className = 'spark';
+    s.textContent = i % 3 ? '✦' : '★';
+    const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 140;
+    s.style.cssText = `left:50%;top:45%;--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d}px;animation-delay:${Math.random() * .2}s`;
+    stage.appendChild(s);
+    setTimeout(() => s.remove(), 1500);
+  }
+}
+
+let busy = false;
+pack.addEventListener('click', async () => {
+  if (busy) return;
+  busy = true;
+  pullMsg.textContent = '';
+  const id = roll();
+  pack.classList.add('shake');
+  await wait(550);
+  pack.classList.remove('shake');
+  pack.classList.add('gone');
+
+  if (id === 'rugger') {
+    pull.innerHTML = `<div class="tcard" style="--c:var(--rugger)"><div class="tcard-inner"><div class="face card-back"><div class="face-in"><img src="img/rugger.webp" alt="The Rugger holding a rolled-up rug" style="width:80%"><span class="rug-note">Empty pack.</span></div></div></div></div>`;
+    pull.className = 'pull';
+    pulls.rugs++;
+    pullMsg.textContent = 'Rugged! The Rugger says: what rug?';
+  } else {
+    // Card comes out face down, then flips
+    pull.innerHTML = cardHTML(id, { flippable: false }).replace('class="tcard"', 'class="tcard flipped"');
+    pull.className = `pull${id === 'myth' ? ' myth' : ''}`;
+    const card = pull.querySelector('.tcard');
+    // Show the card back first: swap the back face for the wrapper art while it is face down
+    const back = card.querySelector('.back');
+    const realBack = back.innerHTML;
+    back.classList.add('card-back');
+    back.innerHTML = '<div class="face-in"><img src="img/coin.webp" alt=""></div>';
+    setTimeout(() => {
+      card.classList.remove('flipped');
+      setTimeout(() => { back.classList.remove('card-back'); back.innerHTML = realBack; }, 700);
+      if (id === 'myth') sparks(22);
+    }, reduceMotion ? 0 : 750);
+    tilt(card);
+    if (id === 'myth') { pulls.myths++; pullMsg.textContent = 'THE MYTH. Gem mint 10. They do exist!'; }
+    else pullMsg.textContent = `You pulled ${CREW[id].name}. ${CREW[id].said}`;
+  }
+  pulls.packs++;
+  store.set(pulls);
+  showPulls();
+  await wait(60);
+  pull.classList.add('up');
+  await wait(1500);
+
+  // Next pack
+  const again = document.createElement('button');
+  again.className = 'btn btn-gold';
+  again.type = 'button';
+  again.textContent = 'Rip another';
+  again.style.cssText = 'position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:5';
+  again.addEventListener('click', () => {
+    again.remove();
+    pull.classList.remove('up');
+    pack.classList.remove('gone');
+    busy = false;
+    pack.focus();
+  });
+  stage.appendChild(again);
+  again.focus({ preventScroll: true });
+});
+
+// ---------- config: CA and links ----------
+function siteUrl() {
+  if (CONFIG.site) return CONFIG.site.replace(/\/$/, '');
+  return /^https:/.test(location.origin) ? location.origin : '';
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function applyConfig() {
+  const ca = (CONFIG.ca || '').trim();
+  const links = {
+    x: CONFIG.x,
+    telegram: CONFIG.telegram,
+    channel: CONFIG.channel || CONFIG.telegram,
+    buy: CONFIG.buy || (ca ? `https://jup.ag/swap/SOL-${ca}` : ''),
+    chart: CONFIG.chart || (ca ? `https://dexscreener.com/solana/${ca}` : '')
+  };
+  document.querySelectorAll('[data-link]').forEach((a) => {
+    const href = links[a.dataset.link];
+    if (href) { a.href = href; a.removeAttribute('aria-disabled'); }
+    else { a.removeAttribute('href'); a.setAttribute('aria-disabled', 'true'); }
+  });
+  const buyLabel = document.querySelector('[data-link="buy"] span');
+  if (buyLabel) buyLabel.textContent = links.buy ? 'Buy $UNCATCHABLE' : 'Buy: soon';
+  document.querySelectorAll('[data-ca]').forEach((el) => { el.textContent = ca || 'Soon'; el.title = ca; });
+  document.querySelectorAll('[data-copy-ca]').forEach((b) => { b.hidden = !ca; });
+  if (ca) {
+    document.querySelector('.pill').innerHTML = '<i></i>Live on Solana';
+    document.getElementById('token-note').textContent = 'Live on Solana. Check that the CA matches the one below before you buy.';
+  }
+
+  const facts = document.getElementById('facts');
+  for (const [k, v] of CONFIG.facts || []) {
+    const d = document.createElement('div');
+    d.className = 'fact';
+    d.innerHTML = '<small></small><strong></strong>';
+    d.querySelector('small').textContent = k;
+    d.querySelector('strong').textContent = v;
+    facts.appendChild(d);
+  }
+}
+
+document.querySelectorAll('[data-copy-ca]').forEach((b) => b.addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(CONFIG.ca.trim()); toast('CA copied'); }
+  catch { toast('Copy failed: select the address by hand'); }
+}));
+
+// ---------- nav + reveal ----------
+const nav = document.getElementById('nav');
+const onScroll = () => nav.classList.toggle('scrolled', scrollY > 30);
+addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+
+const io = new IntersectionObserver((entries) => {
+  for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+}, { threshold: .12, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach((el, i) => {
+  el.style.transitionDelay = `${(i % 4) * 70}ms`;
+  io.observe(el);
+});
+</script>
+
+<script>
+// Manual values. Fill these in after launch; empty values show "Soon" on the page.
+window.CONFIG = {
+  ca: '',                                       // token contract address (mint)
+  buy: '',                                      // optional: defaults to Jupiter with the CA
+  chart: '',                                    // optional: defaults to DexScreener with the CA
+  site: 'https://uncatchable.fun',              // public URL for share links
+  x: 'https://x.com/UNCATCHABLECOIN',
+  telegram: 'https://t.me/uncatchablecoin',     // group chat
+  channel: 'https://t.me/uncatchablechannel',   // announcements
+  facts: []                                     // extra token facts, e.g. [['Supply', '1,000,000,000']]
+};
+applyConfig();
+</script>
+
+<script>
+// ---------- 3D intro: the chase through the card shop ----------
+// Acts: the aisle (store page), the vortex (the chart), the catch (The Myth gets away), the logo landing
+// exactly on the hero logo so the fade into the page is seamless. Time-based, so a slow device skips frames
+// instead of running long. ?intro=debug exposes window.__intro.seek(t) and never ends on its own.
+(function () {
+  const root = document.documentElement;
+  const box = document.getElementById('intro');
+  if (!root.classList.contains('intro-on')) { box.remove(); return; }
+
+  const THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  const THREE_SRI = 'sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==';
+  const debug = /[?&]intro=debug\b/.test(location.search);
+  const canvas = document.getElementById('intro-canvas');
+  const cap = document.getElementById('intro-cap');
+  const bar = document.getElementById('intro-bar');
+  const heroLogo = document.querySelector('.hero-logo');
+
+  // Timeline in seconds
+  const T_CHASE = 4.9;    // aisle + vortex, the camera chases the golden card
+  const T_FLIP = 5.35;    // the card turns: it is The Myth
+  const T_ZIP = 6.1;      // and it gets away
+  const T_LOGO = 6.75;    // logo flies in while the camera pulls back
+  const T_LAND = 7.6;     // camera and logo sit exactly over the hero
+  const END = 8.1;
+
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  scrollTo(0, 0);
+
+  let finished = false, raf = 0, renderer = null;
+  function finish() {
+    if (finished || debug) return;
+    finished = true;
+    try { sessionStorage.setItem('unc-intro', '1'); } catch (e) { /* private mode: it may play again */ }
+    root.classList.remove('intro-on');
+    box.classList.add('out');
+    setTimeout(() => {
+      cancelAnimationFrame(raf);
+      if (renderer) { renderer.dispose(); renderer.forceContextLoss(); }
+      box.remove();
+    }, 950);
+  }
+  document.getElementById('intro-skip').addEventListener('click', finish);
+  addEventListener('keydown', (e) => { if (['Escape', 'Enter', ' '].includes(e.key)) finish(); });
+  addEventListener('wheel', finish, { passive: true });
+  box.addEventListener('touchmove', finish, { passive: true });
+  // Never keep people waiting on a slow connection: show the page instead
+  const guard = debug ? 0 : setTimeout(finish, 7000);
+
+  function loadThree() {
+    return new Promise((resolve, reject) => {
+      if (window.THREE) return resolve(window.THREE);
+      const s = document.createElement('script');
+      s.src = THREE_URL;
+      s.integrity = THREE_SRI;
+      s.crossOrigin = 'anonymous';
+      s.referrerPolicy = 'no-referrer';
+      s.onload = () => (window.THREE ? resolve(window.THREE) : reject(new Error('three.js missing')));
+      s.onerror = () => reject(new Error('three.js failed to load'));
+      document.head.appendChild(s);
+    });
+  }
+  function fonts() {
+    if (!document.fonts || !document.fonts.load) return Promise.resolve();
+    const loads = ['400 80px "Luckiest Guy"', '900 60px Nunito'].map((f) => document.fonts.load(f).catch(() => {}));
+    return Promise.race([Promise.all(loads), new Promise((r) => setTimeout(r, 2500))]);
+  }
+  function image(src) {
+    return new Promise((resolve, reject) => { const i = new Image(); i.onload = () => resolve(i); i.onerror = reject; i.src = src; });
+  }
+
+  const IMAGES = ['img/myth-card.webp', 'img/logo.webp', 'img/coin.webp', 'img/collector.webp', 'img/holder.webp', 'img/scalper.webp', 'img/rugger.webp'];
+  Promise.all([loadThree(), fonts(), ...IMAGES.map(image)])
+    .then(([THREE, , ...imgs]) => { if (!finished) { clearTimeout(guard); start(THREE, imgs); } })
+    .catch(finish);
+
+  // ---------- helpers ----------
+  const clamp01 = (x) => Math.min(1, Math.max(0, x));
+  const span = (a, b, t) => clamp01((t - a) / (b - a));
+  const smooth = (x) => x * x * (3 - 2 * x);
+  const inOutQuad = (x) => (x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
+  const inOutCubic = (x) => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+  const outCubic = (x) => 1 - Math.pow(1 - x, 3);
+  const inCubic = (x) => x * x * x;
+  const outBack = (x) => 1 + 2.70158 * Math.pow(x - 1, 3) + 1.70158 * Math.pow(x - 1, 2);
+  function mulberry(seed) {
+    return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  }
+  function rr(g, x, y, w, h, r) {
+    g.beginPath(); g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+  }
+  function star(g, cx, cy, ro, ri) {
+    g.beginPath();
+    for (let i = 0; i < 10; i++) { const r = i % 2 ? ri : ro, a = -Math.PI / 2 + i * Math.PI / 5; g.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); }
+    g.closePath();
+  }
+
+  function start(THREE, [mythImg, logoImg, coinImg, ...crewImgs]) {
+    const mobile = Math.min(innerWidth, innerHeight) < 600;
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile ? 1.5 : 1.75));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+    const rand = mulberry(11);
+    const R = (a, b) => a + (b - a) * rand();
+    const lin = (hex) => new THREE.Color(hex).convertSRGBToLinear();
+    const tex = (src) => { const t = new THREE.Texture(src); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; t.needsUpdate = true; return t; };
+    const paint = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); return tex(c); };
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), eul = new THREE.Euler(), one = new THREE.Vector3(1, 1, 1), v = new THREE.Vector3();
+
+    // r128 mixes fog in after the sRGB encode, so background and fog take the plain hex values
+    const BG = new THREE.Color('#0a1038'), BG_END = new THREE.Color('#0d1648');
+    const scene = new THREE.Scene();
+    scene.background = BG.clone();
+    scene.fog = new THREE.Fog(BG.clone(), 5, 46);
+    const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 200);
+    let baseFov = 55;
+
+    // ---------- textures ----------
+    function cardFace(gold) {
+      return paint(256, 358, (g, w, h) => {
+        const frame = g.createLinearGradient(0, 0, w, h);
+        [[0, '#ffe08a'], [.45, '#c98a1a'], [.7, '#ffd56a'], [1, '#a8650a']].forEach(([o, c]) => frame.addColorStop(o, c));
+        rr(g, 0, 0, w, h, 22); g.fillStyle = frame; g.fill();
+        let fill;
+        if (gold) {
+          fill = g.createLinearGradient(0, 0, w, h);
+          [[0, '#fff3b8'], [.35, '#ffc83d'], [.6, '#ffe9a0'], [1, '#e08a00']].forEach(([o, c]) => fill.addColorStop(o, c));
+        } else {
+          fill = g.createRadialGradient(w / 2, h / 2, 10, w / 2, h / 2, h * .6);
+          fill.addColorStop(0, '#2c3fa8'); fill.addColorStop(1, '#0b1240');
+        }
+        rr(g, 12, 12, w - 24, h - 24, 14); g.fillStyle = fill; g.fill();
+        g.save(); g.clip(); g.globalAlpha = .13; g.strokeStyle = gold ? '#fff' : '#ffc83d'; g.lineWidth = 8;
+        for (let x = -h; x < w + h; x += 26) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x + h, h); g.stroke(); }
+        g.restore();
+        const ink = gold ? '#b86a00' : '#ffc83d';
+        g.beginPath(); g.arc(w / 2, h / 2, 66, 0, Math.PI * 2); g.lineWidth = 6; g.strokeStyle = ink; g.stroke();
+        star(g, w / 2, h / 2, 50, 21); g.fillStyle = ink; g.fill();
+      });
+    }
+    const sign = (text) => paint(512, 150, (g, w, h) => {
+      rr(g, 5, 5, w - 10, h - 10, 16); g.fillStyle = '#d8322b'; g.fill(); g.lineWidth = 7; g.strokeStyle = '#fff'; g.stroke();
+      g.fillStyle = '#fff'; g.font = '400 74px "Luckiest Guy", Impact, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(text, w / 2, h / 2 + 6);
+    });
+    const boxTex = paint(128, 160, (g, w, h) => {
+      g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+      g.fillStyle = '#c4c6d8'; g.fillRect(0, h * .7, w, h * .13);
+      star(g, w / 2, h * .38, 30, 13); g.fillStyle = '#fff1c2'; g.fill();
+      g.strokeStyle = '#8a8ca8'; g.lineWidth = 6; g.strokeRect(3, 3, w - 6, h - 6);
+    });
+    const glowTex = paint(128, 128, (g, w) => {
+      const r = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+      r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(.25, 'rgba(255,225,150,.55)'); r.addColorStop(1, 'rgba(255,200,80,0)');
+      g.fillStyle = r; g.fillRect(0, 0, w, w);
+    });
+    const sparkTex = paint(64, 64, (g, w) => {
+      const r = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+      r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(.3, 'rgba(255,230,160,.5)'); r.addColorStop(1, 'rgba(255,200,80,0)');
+      g.fillStyle = r; g.fillRect(0, 0, w, w);
+      g.fillStyle = '#fff'; star(g, w / 2, w / 2, 30, 4); g.fill();
+    });
+
+    // ---------- lights ----------
+    scene.add(new THREE.HemisphereLight(lin('#8090ff'), lin('#2a1640'), .6));
+    for (const z of [34, 20, 6]) { const p = new THREE.PointLight(lin('#ffb15c'), 1.6, 16, 1.6); p.position.set(0, 3.7, z); scene.add(p); }
+    const violet = new THREE.PointLight(lin('#9b5cff'), 1.4, 24, 1.4); violet.position.set(-3, 3, -16); scene.add(violet);
+    const blue = new THREE.PointLight(lin('#36a6ff'), 1.4, 24, 1.4); blue.position.set(3, .5, -27); scene.add(blue);
+
+    // ---------- act 1: the store aisle ----------
+    const Z0 = 44, UNITS = 12, UNIT = 4, SX = 2.9, LEVELS = [.12, .98, 1.84, 2.7];
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(16, 62), new THREE.MeshStandardMaterial({ color: lin('#161d52'), roughness: .42, metalness: .25 }));
+    floor.rotation.x = -Math.PI / 2; floor.position.z = Z0 - 29; scene.add(floor);
+
+    const wood = new THREE.MeshStandardMaterial({ color: lin('#c9a26b'), roughness: .7 });
+    const metal = new THREE.MeshStandardMaterial({ color: lin('#3a4282'), roughness: .5, metalness: .4 });
+    const boards = new THREE.InstancedMesh(new THREE.BoxGeometry(.95, .07, UNIT - .1), wood, 2 * UNITS * LEVELS.length);
+    const posts = new THREE.InstancedMesh(new THREE.BoxGeometry(.1, 3.4, .1), metal, 2 * (UNITS + 1));
+    const prods = new THREE.InstancedMesh(new THREE.BoxGeometry(.42, .62, .55), new THREE.MeshStandardMaterial({ map: boxTex, roughness: .55 }), 2 * UNITS * 3 * 7);
+    const palette = ['#36a6ff', '#9b5cff', '#ff6fb5', '#ffc83d', '#8bd43b', '#ff8a3d'].map(lin);
+    const signTex = [sign('OUT OF STOCK'), sign('SOLD OUT')];
+    let bi = 0, pi = 0, ki = 0, si = 0;
+    for (const side of [-1, 1]) {
+      const back = new THREE.Mesh(new THREE.BoxGeometry(.06, 3.4, UNITS * UNIT), new THREE.MeshStandardMaterial({ color: lin('#1b2263'), roughness: .8 }));
+      back.position.set(side * (SX + .5), 1.7, Z0 - UNITS * UNIT / 2); scene.add(back);
+      for (let u = 0; u <= UNITS; u++) { m4.makeTranslation(side * (SX - .45), 1.7, Z0 - u * UNIT); posts.setMatrixAt(pi++, m4); }
+      for (let u = 0; u < UNITS; u++) {
+        const zc = Z0 - u * UNIT - UNIT / 2;
+        for (const y of LEVELS) { m4.makeTranslation(side * SX, y, zc); boards.setMatrixAt(bi++, m4); }
+        // Most of the shop is sold out
+        if (u > 0 && rand() < .45) {
+          const s = new THREE.Mesh(new THREE.PlaneGeometry(1.15, .34), new THREE.MeshBasicMaterial({ map: signTex[si++ % 2], toneMapped: false }));
+          s.position.set(side * (SX - .5), LEVELS[1] + R(.2, .45), zc + R(-1.1, 1.1));
+          s.rotation.set(0, -side * Math.PI / 2, R(-.12, .12));
+          scene.add(s);
+          continue;
+        }
+        for (let l = 0; l < 3; l++) {
+          if (rand() < .3) continue;
+          const n = 2 + Math.floor(rand() * 5);
+          for (let k = 0; k < n; k++) {
+            const z = zc - UNIT / 2 + .4 + k * .58;
+            eul.set(0, R(-.18, .18), 0); q.setFromEuler(eul);
+            m4.compose(v.set(side * (SX + R(-.05, .08)), LEVELS[l] + .345, z), q, one);
+            prods.setMatrixAt(ki, m4); prods.setColorAt(ki, palette[Math.floor(rand() * palette.length)]); ki++;
+          }
+        }
+      }
+    }
+    prods.count = ki;
+    for (const im of [boards, posts, prods]) { im.frustumCulled = false; im.instanceMatrix.needsUpdate = true; scene.add(im); }
+
+    // ---------- act 2: the vortex of cards, coins and two charts ----------
+    const NC = mobile ? 110 : 180;
+    const cards = new THREE.InstancedMesh(new THREE.PlaneGeometry(.62, .87), new THREE.MeshBasicMaterial({ map: cardFace(false), side: THREE.DoubleSide, toneMapped: false }), NC);
+    cards.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    cards.frustumCulled = false;
+    scene.add(cards);
+    const cardData = Array.from({ length: NC }, () => {
+      const z = R(8, -60);
+      return { z, a: R(0, Math.PI * 2), r: z > -6 ? R(1.3, 2.1) : R(1.7, 4.8), w: R(.25, .7) * (rand() < .5 ? -1 : 1), sx: R(.6, 2.2), sy: R(.6, 2.2), px: R(0, 6), py: R(0, 6), y0: R(-.3, .3) };
+    });
+
+    const coinMat = new THREE.SpriteMaterial({ map: tex(coinImg), transparent: true, depthWrite: false });
+    const coins = Array.from({ length: mobile ? 26 : 40 }, () => {
+      const z = R(30, -60);
+      const s = new THREE.Sprite(coinMat); scene.add(s);
+      return { s, z, a: R(0, Math.PI * 2), r: z > -6 ? R(1.1, 2) : R(1.6, 4.4), w: R(.2, .6), size: R(.32, .6), ph: R(0, 6) };
+    });
+
+    // Candles: a rising chart on the right, a falling one on the left
+    const NK = 26;
+    const candles = new THREE.InstancedMesh(new THREE.BoxGeometry(.2, 1, .2), new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }), NK * 4);
+    const green = lin('#2bd96b'), red = lin('#ff4d5e');
+    let ci = 0;
+    for (const side of [1, -1]) {
+      let y = side > 0 ? .1 : 3.5;
+      for (let k = 0; k < NK; k++) {
+        const z = -9 - k * .95, up = rand() < (side > 0 ? .68 : .3), h = R(.25, .9);
+        const y1 = y + (up ? h : -h), mid = (y + y1) / 2, col = up ? green : red;
+        m4.compose(v.set(side * 4.6, mid, z), q.identity(), new THREE.Vector3(1, Math.abs(y1 - y), 1)); candles.setMatrixAt(ci, m4); candles.setColorAt(ci++, col);
+        m4.compose(v.set(side * 4.6, mid, z), q.identity(), new THREE.Vector3(.22, Math.abs(y1 - y) + R(.3, .7), .22)); candles.setMatrixAt(ci, m4); candles.setColorAt(ci++, col);
+        y = y1 + R(-.12, .12);
+      }
+    }
+    candles.frustumCulled = false;
+    scene.add(candles);
+
+    // Speed streaks around the path
+    const NS = mobile ? 90 : 160, streakPos = new Float32Array(NS * 6);
+    for (let i = 0; i < NS; i++) {
+      const z = R(42, -58), a = R(0, Math.PI * 2), r = z > -6 ? R(.8, 2.2) : R(1, 4.5), len = R(1.2, 3);
+      const x = Math.cos(a) * r, y = 1.8 + Math.sin(a) * r * .8;
+      streakPos.set([x, y, z, x, y, z - len], i * 6);
+    }
+    const streakGeo = new THREE.BufferGeometry();
+    streakGeo.setAttribute('position', new THREE.BufferAttribute(streakPos, 3));
+    const streaks = new THREE.LineSegments(streakGeo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: .3, blending: THREE.AdditiveBlending, depthWrite: false }));
+    scene.add(streaks);
+
+    // ---------- the golden card: The Myth ----------
+    const goldCard = new THREE.Group();
+    const cardBackFace = new THREE.Mesh(new THREE.PlaneGeometry(1, 1.4), new THREE.MeshBasicMaterial({ map: cardFace(true), toneMapped: false, transparent: true }));
+    const mythH = 1.7, mythFace = new THREE.Mesh(new THREE.PlaneGeometry(mythH * mythImg.width / mythImg.height, mythH), new THREE.MeshBasicMaterial({ map: tex(mythImg), toneMapped: false, transparent: true, depthWrite: false }));
+    mythFace.rotation.y = Math.PI;
+    goldCard.add(cardBackFace, mythFace);
+    scene.add(goldCard);
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: lin('#ffc83d'), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+    scene.add(glow);
+    const goldLight = new THREE.PointLight(lin('#ffc83d'), 2.2, 9, 1.5);
+    scene.add(goldLight);
+
+    const NSP = 70, sparkPos = new Float32Array(NSP * 3), sparkDir = [];
+    for (let i = 0; i < NSP; i++) sparkDir.push(new THREE.Vector3(R(-1, 1), R(-1, 1), R(-.4, .4)).normalize().multiplyScalar(R(1.2, 3.2)));
+    const sparkGeo = new THREE.BufferGeometry();
+    sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3));
+    const sparks = new THREE.Points(sparkGeo, new THREE.PointsMaterial({ map: sparkTex, size: .28, color: lin('#ffe27a'), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+    sparks.frustumCulled = false;
+    scene.add(sparks);
+
+    // ---------- act 3: the crew jumps for it ----------
+    const crewSpots = [[-1.75, 1.15, -37.4], [-.95, .75, -36.9], [1.75, 1.15, -37.4], [.95, .75, -36.9]];  // collector, holder, scalper, rugger
+    const crew = crewImgs.map((img) => {
+      const h = 1.25, mesh = new THREE.Mesh(new THREE.PlaneGeometry(h * img.width / img.height, h), new THREE.MeshBasicMaterial({ map: tex(img), transparent: true, toneMapped: false, depthWrite: false, fog: false }));
+      mesh.renderOrder = 5;
+      scene.add(mesh);
+      return mesh;
+    });
+
+    // ---------- act 4: the logo ----------
+    const logo = new THREE.Mesh(new THREE.PlaneGeometry(logoImg.width / logoImg.height, 1), new THREE.MeshBasicMaterial({ map: tex(logoImg), transparent: true, toneMapped: false, depthWrite: false, depthTest: false, fog: false }));
+    logo.renderOrder = 10;
+    scene.add(logo);
+
+    // ---------- camera path ----------
+    const path = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 1.45, 42), new THREE.Vector3(.3, 1.65, 28), new THREE.Vector3(-.3, 1.9, 14), new THREE.Vector3(.4, 2, 1),
+      new THREE.Vector3(-1.1, 2.4, -10), new THREE.Vector3(1, 1.5, -20), new THREE.Vector3(-.4, 1.9, -28), new THREE.Vector3(0, 1.8, -34)
+    ], false, 'centripetal');
+    const CAM_CATCH = new THREE.Vector3(0, 1.8, -34);
+    const CARD_REST = new THREE.Vector3(0, 1.95, -38.6);
+    const CARD_GONE = new THREE.Vector3(4.5, 6.8, -54);
+    const CAM_END = new THREE.Vector3(0, 1.8, -29.5);
+    const LOGO_DIST = 7;
+
+    const CAPS = [[.35, 2.45, 'Some refresh the store page.', false], [2.75, 4.6, 'Others refresh a chart.', false], [T_ZIP, 7, 'One second too late.', true]];
+    let capNow = null;
+
+    function resize() {
+      const w = innerWidth, h = innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      baseFov = camera.aspect < .8 ? 72 : camera.aspect < 1.2 ? 62 : 55;
+      camera.updateProjectionMatrix();
+    }
+    addEventListener('resize', resize);
+    resize();
+
+    const camPos = new THREE.Vector3(), look = new THREE.Vector3(), tangent = new THREE.Vector3(), cardPos = new THREE.Vector3(), tmp = new THREE.Vector3();
+    const held = new THREE.Vector3(), ahead = new THREE.Vector3(), endTangent = path.getTangentAt(1);
+
+    function render(tIn) {
+      const t = Math.min(tIn, END);
+
+      // camera: the chase along the path, a push-in on the catch, a pull-back for the logo
+      let roll = 0, fovKick = 0;
+      if (t < T_CHASE) {
+        const u = inOutQuad(t / T_CHASE);
+        path.getPointAt(u, camPos);
+        path.getTangentAt(u, tangent);
+        roll = -tangent.x * 1.4 + Math.sin(t * 1.3) * .05;
+        fovKick = Math.sin(Math.PI * t / T_CHASE) * 12;
+        // the card stays a few metres ahead, fluttering
+        cardPos.copy(camPos).addScaledVector(tangent, 5.2);
+        cardPos.x += Math.sin(t * 2.3) * .45;
+        cardPos.y += Math.sin(t * 3.1) * .3;
+        look.copy(camPos).addScaledVector(tangent, 8).lerp(cardPos, .7);
+      } else {
+        const push = outCubic(span(T_CHASE, T_LOGO, t)) * .5;
+        camPos.copy(CAM_CATCH); camPos.z -= push;
+        camPos.lerp(CAM_END, inOutCubic(span(T_LOGO, T_LAND, t)));
+        // card settles in front of the camera (continuing the chase pose), then zips away
+        const settle = smooth(span(T_CHASE, T_FLIP, t));
+        held.copy(CAM_CATCH).addScaledVector(endTangent, 5.2);
+        held.x += Math.sin(t * 2.3) * .45 * (1 - settle);
+        held.y += Math.sin(t * 3.1) * .3 * (1 - settle);
+        held.lerp(CARD_REST, settle);
+        cardPos.copy(held).lerp(CARD_GONE, inCubic(span(T_ZIP, T_ZIP + .45, t)));
+        // keep looking where the card was, then straight ahead for the landing
+        look.copy(CAM_CATCH).addScaledVector(endTangent, 8).lerp(held, .7 + .3 * settle);
+        ahead.copy(camPos); ahead.z -= 10;
+        look.lerp(ahead, smooth(span(T_ZIP, T_LAND - .2, t)));
+        // a jolt when it gets away
+        const jolt = 1 - span(T_ZIP, T_ZIP + .35, t);
+        if (t > T_ZIP && jolt > 0) { camPos.x += Math.sin(t * 90) * .035 * jolt; camPos.y += Math.cos(t * 77) * .03 * jolt; }
+      }
+      // gentle handheld drift, gone by the landing so the logo lines up
+      const drift = 1 - span(T_LOGO, T_LAND, t);
+      camPos.x += Math.sin(t * 1.7) * .04 * drift;
+      camPos.y += Math.sin(t * 2.3) * .03 * drift;
+      camera.position.copy(camPos);
+      camera.up.set(0, 1, 0);
+      camera.lookAt(look);
+      camera.rotateZ(roll * (1 - span(T_CHASE - .9, T_CHASE, t)));
+      camera.fov = baseFov + fovKick;
+      camera.updateProjectionMatrix();
+
+      // the golden card
+      goldCard.position.copy(cardPos);
+      const flutter = 1 - smooth(span(T_CHASE, T_FLIP, t));
+      const flip = inOutCubic(span(T_FLIP, T_FLIP + .45, t));
+      const spin = inCubic(span(T_ZIP, T_ZIP + .45, t)) * 9;
+      goldCard.rotation.set(Math.cos(t * 4) * .3 * flutter, Math.sin(t * 5) * .6 * flutter + flip * Math.PI, Math.sin(t * 3) * .4 * flutter + spin);
+      const pop = 1 + Math.sin(Math.PI * flip) * .25 + flip * .1;
+      goldCard.scale.setScalar(pop);
+      tmp.copy(cardPos).sub(camPos).normalize();
+      glow.position.copy(cardPos).addScaledVector(tmp, .4);
+      const glowSize = 3 + Math.sin(t * 6) * .25 + Math.sin(Math.PI * flip) * 2.5 + flip * 1.2;
+      glow.scale.set(glowSize, glowSize, 1);
+      goldLight.position.copy(cardPos);
+      goldLight.intensity = 2.2 + flip * 2;
+
+      // sparkle burst on the flip
+      const age = span(T_FLIP + .15, T_FLIP + 1.1, t);
+      sparks.visible = age > 0 && age < 1;
+      if (sparks.visible) {
+        for (let i = 0; i < NSP; i++) {
+          const d = sparkDir[i], k = outCubic(age);
+          sparkPos[i * 3] = CARD_REST.x + d.x * k; sparkPos[i * 3 + 1] = CARD_REST.y + d.y * k; sparkPos[i * 3 + 2] = CARD_REST.z + .3 + d.z * k;
+        }
+        sparkGeo.attributes.position.needsUpdate = true;
+        sparks.material.opacity = 1 - age;
+      }
+
+      // the vortex opens up and the fog closes in for the landing
+      const clear = smooth(span(T_ZIP + .3, T_LAND, t));
+      for (let i = 0; i < NC; i++) {
+        const d = cardData[i], a = d.a + t * d.w, r = d.r * (1 + clear * 2.6);
+        eul.set(t * d.sx + d.px, t * d.sy + d.py, a); q.setFromEuler(eul);
+        m4.compose(v.set(Math.cos(a) * r, 1.8 + Math.sin(a) * r * .8 + d.y0, d.z), q, one);
+        cards.setMatrixAt(i, m4);
+      }
+      cards.instanceMatrix.needsUpdate = true;
+      for (const c of coins) {
+        const a = c.a + t * c.w, r = c.r * (1 + clear * 2.6);
+        c.s.position.set(Math.cos(a) * r, 1.8 + Math.sin(a) * r * .8, c.z);
+        c.s.scale.set(c.size * Math.max(.12, Math.abs(Math.cos(t * 3 + c.ph))), c.size, 1);
+      }
+      candles.scale.x = 1 + clear * 1.5;
+      streaks.material.opacity = .3 * (1 - span(T_CHASE - .8, T_CHASE + .2, t));
+      scene.fog.near = 5 - clear * 2;
+      scene.fog.far = 46 - clear * 30;
+      scene.fog.color.copy(BG).lerp(BG_END, clear);
+      scene.background.copy(scene.fog.color);
+
+      // the crew hops up for the card, then drops when it is gone
+      const hw = 3.4 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2) * camera.aspect;
+      const fit = Math.min(1, hw * .8 / 1.95);
+      crew.forEach((mesh, i) => {
+        const [x, y, z] = crewSpots[i];
+        const rise = span(T_FLIP + .15 + i * .07, T_FLIP + .6 + i * .07, t), fall = span(T_ZIP + .05 + i * .05, T_ZIP + .5 + i * .05, t);
+        const up = outBack(rise), down = inCubic(fall);
+        mesh.visible = rise > 0 && fall < 1;
+        mesh.position.set(x * fit, y - 2.4 * (1 - up) - 2.8 * down, z);
+        mesh.rotation.z = (x < 0 ? -1 : 1) * (.12 * up - .25 * down);
+        mesh.scale.setScalar(Math.max(.62, fit));
+      });
+
+      // the logo lands exactly on the hero logo under the overlay
+      const fly = span(T_LOGO, T_LAND - .1, t);
+      logo.visible = fly > 0;
+      if (logo.visible) {
+        const r = heroLogo.getBoundingClientRect();
+        const k = 2 * LOGO_DIST * Math.tan(THREE.MathUtils.degToRad(baseFov) / 2) / innerHeight;
+        tmp.set(CAM_END.x + (r.left + r.width / 2 - innerWidth / 2) * k, CAM_END.y - (r.top + r.height / 2 - innerHeight / 2) * k, CAM_END.z - LOGO_DIST);
+        const p = outCubic(fly);
+        logo.position.set(tmp.x, tmp.y + (1 - p) * .6, tmp.z - (1 - p) * 30);
+        logo.scale.setScalar(r.height * k * (.75 + .25 * outBack(fly)));
+        logo.rotation.set(0, (1 - p) * -.9, (1 - p) * .2);
+      }
+
+      // captions and progress
+      let o = 0, now = null;
+      for (const c of CAPS) if (t >= c[0] && t <= c[1]) { now = c; o = Math.min(1, (t - c[0]) / .3, (c[1] - t) / .3); }
+      if (now && now !== capNow) { capNow = now; cap.textContent = now[2]; cap.classList.toggle('big', now[3]); }
+      cap.style.opacity = o;
+      cap.style.transform = now && now[3] ? `scale(${.85 + .15 * outBack(span(now[0], now[0] + .3, t))})` : `translateY(${(1 - o) * 14}px)`;
+      bar.style.transform = `scaleX(${t / END})`;
+      canvas.style.opacity = smooth(span(0, .5, t));
+
+      renderer.render(scene, camera);
+    }
+
+    box.classList.add('ready');
+    render(0);
+    let t0 = performance.now(), seekT = 0;
+    if (debug) window.__intro = { seek(t) { seekT = t; render(t); return t; } };
+    function frame(now) {
+      const t = debug ? seekT : (now - t0) / 1000;
+      if (!debug) render(t);
+      if (t >= END) finish();
+      raf = requestAnimationFrame(frame);
+    }
+    t0 = performance.now();
+    raf = requestAnimationFrame(frame);
+  }
+})();
+</script>
+</body>
+</html>
