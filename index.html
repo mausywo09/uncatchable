@@ -1616,6 +1616,10 @@ applyConfig();
     }
 
     box.classList.add('ready');
+    // Warm-up: draw the catch and the landing once while the canvas is still transparent, so their shaders and
+    // textures are ready before they first appear (otherwise the crew and the logo stutter in on slow devices)
+    render(T_FLIP + .5);
+    render(T_LAND);
     render(0);
     let t0 = performance.now(), seekT = 0;
     if (debug) window.__intro = { seek(t) { seekT = t; render(t); return t; } };
