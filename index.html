@@ -457,6 +457,16 @@ h3 { margin: 0; font: 400 26px/1.05 var(--display); letter-spacing: .02em; }
 .fact.ca { grid-column: span 2; }
 .fact.ca .row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
 .fact.ca code { font: 700 16px/1.3 ui-monospace, Consolas, monospace; overflow-wrap: anywhere; flex: 1; min-width: 0; }
+/* facts read from the chain: longer values, so a smaller body font */
+.fact.sm strong { font: 800 17px/1.35 var(--body); letter-spacing: 0; }
+.curve { margin-top: 16px; border-radius: 18px; padding: 20px 22px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.curve-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.curve-top .kicker { margin: 0; }
+.curve-top strong { font: 400 30px/1 var(--display); color: var(--gold-hi); }
+.curve-bar { margin-top: 12px; height: 16px; border-radius: 99px; overflow: hidden; background: rgba(255, 255, 255, .08); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.curve-bar i { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--holder), var(--gold)); box-shadow: 0 0 18px rgba(255, 200, 61, .5); transition: width 1s cubic-bezier(.2, .8, .2, 1); }
+.curve.done .curve-bar i { background: linear-gradient(90deg, var(--gold), #fff3b8); }
+.curve p { margin: 10px 0 0; color: var(--muted); font-size: 15px; }
 .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 42px; counter-reset: st; }
 .step { border-radius: 18px; padding: 22px; background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
 .step::before { counter-increment: st; content: counter(st); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--gold); color: #2a1600; font: 400 22px/1 var(--display); margin-bottom: 14px; }
@@ -469,8 +479,12 @@ h3 { margin: 0; font: 400 26px/1.05 var(--display); letter-spacing: .02em; }
   .facts, .steps { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 520px) {
-  .facts, .steps { grid-template-columns: 1fr; }
-  .fact.ca { grid-column: auto; }
+  .steps { grid-template-columns: 1fr; }
+  /* the main tiles stay full width; the short facts from the chain pair up */
+  .facts { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .fact:not(.sm) { grid-column: span 2; }
+  .fact.sm { padding: 16px; }
+  .fact.sm strong { font-size: 15px; }
 }
 
 /* community */
@@ -749,6 +763,11 @@ html.intro-on .hero-logo { animation: none; }
         <div class="fact"><small>Ticker</small><strong>$UNCATCHABLE</strong></div>
         <div class="fact"><small>Chain</small><strong>Solana</strong></div>
         <div class="fact ca"><small>Contract address</small><div class="row"><code data-ca>Soon</code><button class="copy" type="button" data-copy-ca><svg><use href="#i-copy"/></svg>Copy</button></div></div>
+      </div>
+      <div class="curve" id="curve" hidden>
+        <div class="curve-top"><span class="kicker">Bonding curve</span><strong data-curve="pct">0%</strong></div>
+        <div class="curve-bar" role="progressbar" aria-label="Bonding curve progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-curve="bar"><i data-curve="fill"></i></div>
+        <p data-curve="sub"></p>
       </div>
       <div class="steps">
         <div class="step reveal"><h3>Get a wallet</h3><p>Install Phantom or Solflare and write the seed phrase down somewhere offline.</p></div>
@@ -1090,8 +1109,20 @@ function toast(msg) {
   toast.timer = setTimeout(() => t.classList.remove('show'), 1800);
 }
 
+// The last /api/launch answer while the token is live. A CA typed into CONFIG wins: if it names a different
+// token than the one detected, the live data is ignored.
+let LIVE = null;
+const isMint = (s) => typeof s === 'string' && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(s);
+function liveData() {
+  const typed = (CONFIG.ca || '').trim();
+  return LIVE && (!typed || typed === LIVE.mint) ? LIVE : null;
+}
+function currentCa() { return (CONFIG.ca || '').trim() || (liveData() ? liveData().mint : ''); }
+const fmtNum = (n) => Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+
 function applyConfig() {
-  const ca = (CONFIG.ca || '').trim();
+  const ca = currentCa();
+  const live = liveData();
   const links = {
     x: CONFIG.x,
     telegram: CONFIG.telegram,
@@ -1108,26 +1139,87 @@ function applyConfig() {
   if (buyLabel) buyLabel.textContent = links.buy ? 'Buy $UNCATCHABLE' : 'Buy: soon';
   document.querySelectorAll('[data-ca]').forEach((el) => { el.textContent = ca || 'Soon'; el.title = ca; });
   document.querySelectorAll('[data-copy-ca]').forEach((b) => { b.hidden = !ca; });
+  const curve = live && live.curve;
+  const curvePct = curve ? (curve.graduated ? 100 : Math.max(0, Math.min(100, Number(curve.progress) || 0))) : 0;
+  const pctText = curve && curve.graduated ? 'Graduated' : (curvePct < 10 ? curvePct.toFixed(1) : String(Math.round(curvePct))) + '%';
   if (ca) {
-    document.querySelector('.pill').innerHTML = '<i></i>Live on Solana';
+    document.querySelector('.pill').innerHTML = '<i></i>Live on Solana' + (curve ? (curve.graduated ? ' · graduated' : ` · curve ${pctText}`) : '');
     document.getElementById('token-note').textContent = 'Live on Solana. Check that the CA matches the one below before you buy.';
   }
 
+  // Facts: the ones typed into CONFIG first, then what the chain says (rebuilt on every refresh)
   const facts = document.getElementById('facts');
-  for (const [k, v] of CONFIG.facts || []) {
+  facts.querySelectorAll('[data-extra]').forEach((el) => el.remove());
+  const F = (live && live.facts) || {};
+  const extra = [...(CONFIG.facts || [])];
+  const typed = new Set(extra.map(([k]) => k.toLowerCase()));
+  const chain = [
+    ['Supply', F.supply && fmtNum(F.supply)],
+    ['Bonding curve', F.curvePercent != null && `${F.curvePercent}% of supply`],
+    ['Graduates at', F.migrationThreshold != null && `${fmtNum(F.migrationThreshold)} ${F.quoteSymbol || 'SOL'}`],
+    ['Migrates to', F.migratesTo],
+    ['Trading fee', F.tradingFee],
+    ['Graduation LP', F.lpLock],
+    ['Mint authority', F.mintAuthority],
+    ['Freeze authority', F.freezeAuthority]
+  ];
+  for (const [k, v] of chain) if (v && !typed.has(k.toLowerCase())) extra.push([k, v]);
+  extra.forEach(([k, v], i) => {
     const d = document.createElement('div');
-    d.className = 'fact';
+    d.className = i < (CONFIG.facts || []).length ? 'fact' : 'fact sm';
+    d.dataset.extra = '';
     d.innerHTML = '<small></small><strong></strong>';
     d.querySelector('small').textContent = k;
     d.querySelector('strong').textContent = v;
     facts.appendChild(d);
+  });
+
+  // Bonding curve meter
+  const meter = document.getElementById('curve');
+  meter.hidden = !curve;
+  if (curve) {
+    const target = (F.migratesTo || 'a Meteora DAMM pool').replace(/ \(.*\)$/, '');
+    meter.classList.toggle('done', !!curve.graduated);
+    meter.querySelector('[data-curve="pct"]').textContent = pctText;
+    meter.querySelector('[data-curve="fill"]').style.width = curvePct + '%';
+    meter.querySelector('[data-curve="bar"]').setAttribute('aria-valuenow', String(Math.round(curvePct)));
+    meter.querySelector('[data-curve="sub"]').textContent = curve.graduated
+      ? `The curve is full. $UNCATCHABLE now trades on ${target}.`
+      : `${fmtNum(curve.raised)} / ${fmtNum(curve.threshold)} ${curve.quoteSymbol} in the curve. At 100% it graduates to ${target}.`;
   }
 }
 
 document.querySelectorAll('[data-copy-ca]').forEach((b) => b.addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(CONFIG.ca.trim()); toast('CA copied'); }
+  try { await navigator.clipboard.writeText(currentCa()); toast('CA copied'); }
   catch { toast('Copy failed: select the address by hand'); }
 }));
+
+// Asks the site's own API (server/api.mjs): every 30 s before launch, every 15 s while the curve fills,
+// every 2 min after graduation. A static preview without the API answers 404, which stops it.
+function initLive() {
+  let timer = 0, wasLive = false, sawPending = false;
+  const schedule = (ms) => { clearTimeout(timer); timer = setTimeout(poll, ms); };
+  function poll() {
+    if (document.hidden) return schedule(5000);
+    fetch('/api/launch', { cache: 'no-store', headers: { Accept: 'application/json' } })
+      .then((r) => {
+        if (r.status === 404) throw new Error('stop');
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then((data) => {
+        const live = !!data && data.status === 'live' && isMint(data.mint);
+        LIVE = live ? data : null;
+        applyConfig();
+        if (live && !wasLive && sawPending) toast('$UNCATCHABLE is live. The CA just loaded from the chain.');
+        if (!live) sawPending = true;
+        wasLive = live;
+        schedule(!live ? 30000 : data.curve && data.curve.graduated ? 120000 : 15000);
+      })
+      .catch((err) => { if (err.message !== 'stop') schedule(60000); });
+  }
+  poll();
+}
 
 // ---------- nav + reveal ----------
 const nav = document.getElementById('nav');
@@ -1156,7 +1248,10 @@ window.CONFIG = {
   channel: 'https://t.me/uncatchablechannel',   // announcements
   facts: []                                     // extra token facts, e.g. [['Supply', '1,000,000,000']]
 };
+// The CA, links, tokenomics and curve also fill in by themselves from /api/launch once the creator wallet
+// BYHnxEoh…wBB launches on Meteora DBC (server/launch.mjs). Typing a CA here pins it by hand.
 applyConfig();
+initLive();
 </script>
 
 <script>
