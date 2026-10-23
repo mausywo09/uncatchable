@@ -13,6 +13,8 @@ export const DBC_PROGRAM = 'dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN'
 export const DEFAULT_CREATOR = 'BYHnxEoh9TMymfBuYLRh81kvEcwJ2h2tZx9rmcr3wBB'
 export const DEFAULT_SINCE = '2026-10-23T07:00:00Z'
 export const DEFAULT_SYMBOL = 'UCC'
+// How often, at most, the chain is asked for the launch before it is found
+const CHECK_MS = 8_000
 
 // Anchor discriminators of initialize_virtual_pool_with_spl_token / _with_token2022
 const INIT = [
@@ -282,7 +284,8 @@ export function describe(c, m) {
 }
 
 /**
- * What /api/launch answers. Before launch the chain is asked at most every 30 s; a found launch is kept for good.
+ * What /api/launch answers. Before launch the chain is asked at most every CHECK_MS (shared by every visitor, about
+ * one cheap getSignaturesForAddress call); a found launch is kept for good.
  * Facts are read once (the mint again every 10 min), the curve at most every 10 s, shared by every visitor.
  * @param {{ rpc: Rpc, env: Record<string, string | undefined>, now?: () => number, log?: (...a: unknown[]) => void }} d
  */
@@ -328,7 +331,7 @@ export function createLaunchResolver({ rpc, env, now = Date.now, log = () => {} 
       reason = 'not-launched'
     } catch (e) {
       reason = 'unavailable'
-      launchCheckedAt -= 15_000 // try again after 15 s instead of 30
+      launchCheckedAt -= CHECK_MS / 2 // try again sooner than the normal interval
       log(`uncatchable lookup failed: ${/** @type {Error} */ (e).message}`)
     }
   }
@@ -374,7 +377,7 @@ export function createLaunchResolver({ rpc, env, now = Date.now, log = () => {} 
     /** @returns {Promise<Record<string, unknown>>} */
     async get() {
       if (!isAddress(pinned) && !isAddress(creator)) return { status: 'not-configured' }
-      if (!launch && now() - launchCheckedAt >= 30_000) {
+      if (!launch && now() - launchCheckedAt >= CHECK_MS) {
         launchCheckedAt = now()
         once('detect', detect)
       }

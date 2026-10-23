@@ -1245,7 +1245,7 @@ document.querySelectorAll('[data-copy-ca]').forEach((b) => b.addEventListener('c
   b.doneTimer = setTimeout(() => { b.classList.remove('done'); set('#i-copy', 'Copy'); }, 1600);
 }));
 
-// Asks the site's own API (server/api.mjs): every 30 s before launch, every 15 s while the curve fills,
+// Asks the site's own API (server/api.mjs): every 10 s before launch, every 15 s while the curve fills,
 // every 2 min after graduation. A static preview without the API answers 404, which stops it.
 function initLive() {
   let timer = 0, wasLive = false, sawPending = false;
@@ -1265,7 +1265,7 @@ function initLive() {
         if (live && !wasLive && sawPending) toast('$UCC is live. The CA just loaded from the chain.');
         if (!live) sawPending = true;
         wasLive = live;
-        schedule(!live ? 30000 : data.curve && data.curve.graduated ? 120000 : 15000);
+        schedule(!live ? 10000 : data.curve && data.curve.graduated ? 120000 : 15000);
       })
       .catch((err) => { if (err.message !== 'stop') schedule(60000); });
   }
