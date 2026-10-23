@@ -6,11 +6,13 @@
 // Detection rule (same as Curvetap's $CTAP): the first Meteora DBC pool-creation transaction SIGNED by the creator
 // wallet (UNC_CREATOR) after UNC_SINCE. It reads the creator wallet's own history, not the pools' `creator`
 // field, because `transfer_pool_creator` lets anyone hand a pool to any wallet without its signature.
-// UNC_MINT pins a mint by hand and wins.
+// UNC_MINT pins a mint by hand and wins. The pool's symbol must also be UNC_SYMBOL (default UCC), so another token
+// launched from the same wallet is never taken for $UCC; an empty UNC_SYMBOL turns that check off.
 
 export const DBC_PROGRAM = 'dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN'
 export const DEFAULT_CREATOR = 'BYHnxEoh9TMymfBuYLRh81kvEcwJ2h2tZx9rmcr3wBB'
 export const DEFAULT_SINCE = '2026-10-23T07:00:00Z'
+export const DEFAULT_SYMBOL = 'UCC'
 
 // Anchor discriminators of initialize_virtual_pool_with_spl_token / _with_token2022
 const INIT = [
@@ -105,8 +107,28 @@ export function jsonRpc(urls, doFetch = fetch) {
   }
 }
 
-/** @param {any} tx @param {string} creator @returns {{ mint: string, pool: string } | null} */
-function launchIn(tx, creator) {
+/**
+ * Name and symbol from the initialize instruction's params (Borsh strings name, symbol, uri after the discriminator).
+ * @param {Uint8Array} data
+ */
+export function poolParams(data) {
+  const v = new DataView(data.buffer, data.byteOffset, data.byteLength)
+  const out = []
+  let at = 8
+  for (let i = 0; i < 2; i++) {
+    if (at + 4 > data.length) return null
+    const len = v.getUint32(at, true)
+    if (len > 200 || at + 4 + len > data.length) return null
+    out.push(new TextDecoder().decode(data.subarray(at + 4, at + 4 + len)))
+    at += 4 + len
+  }
+  return { name: out[0], symbol: out[1] }
+}
+/** @param {string} s */
+const normSymbol = (s) => s.trim().replace(/^\$/, '').toUpperCase()
+
+/** @param {any} tx @param {string} creator @param {string} [symbol] @returns {{ mint: string, pool: string, name?: string, symbol?: string } | null} */
+function launchIn(tx, creator, symbol = '') {
   const msg = tx?.transaction?.message
   if (!msg || tx.meta?.err) return null
   const signers = (msg.accountKeys ?? []).filter((/** @type {any} */ k) => k?.signer).map((/** @type {any} */ k) => k.pubkey)
@@ -117,17 +139,20 @@ function launchIn(tx, creator) {
     const data = b58decode(ix.data)
     if (!data || !INIT.some((d) => d.every((b, i) => data[i] === b))) continue
     const [mint, pool] = [ix.accounts[IX_MINT], ix.accounts[IX_POOL]]
-    if (ix.accounts[IX_CREATOR] === creator && signers.includes(mint) && isAddress(mint) && isAddress(pool)) return { mint, pool }
+    if (ix.accounts[IX_CREATOR] !== creator || !signers.includes(mint) || !isAddress(mint) || !isAddress(pool)) continue
+    const params = poolParams(data)
+    if (symbol && (!params || normSymbol(params.symbol) !== normSymbol(symbol))) continue
+    return { mint, pool, ...(params ?? {}) }
   }
   return null
 }
 
 /**
- * The first DBC launch signed by `creator` at or after `since` (unix seconds), or null.
+ * The first DBC launch signed by `creator` at or after `since` (unix seconds) with `symbol` (if given), or null.
  * @param {Rpc} rpc
- * @param {{ creator: string, since: number, maxPages?: number, maxTx?: number }} o
+ * @param {{ creator: string, since: number, symbol?: string, maxPages?: number, maxTx?: number }} o
  */
-export async function findLaunch(rpc, { creator, since, maxPages = 5, maxTx = 40 }) {
+export async function findLaunch(rpc, { creator, since, symbol = '', maxPages = 5, maxTx = 40 }) {
   /** @type {{ signature: string, blockTime: number }[]} */
   const candidates = []
   /** @type {string | undefined} */
@@ -141,8 +166,15 @@ export async function findLaunch(rpc, { creator, since, maxPages = 5, maxTx = 40
   }
   candidates.sort((a, b) => a.blockTime - b.blockTime) // oldest first: the first launch wins
   for (const c of candidates.slice(0, maxTx)) {
-    const tx = await rpc('getTransaction', [c.signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }])
-    const hit = launchIn(tx, creator)
+    let tx
+    try {
+      tx = await rpc('getTransaction', [c.signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }])
+    } catch (e) {
+      // A newer transaction format (v1) must not stop the scan: ask again allowing it, or skip it
+      if (!/transaction version/i.test(/** @type {Error} */ (e).message)) throw e
+      tx = await rpc('getTransaction', [c.signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 1, commitment: 'confirmed' }]).catch(() => null)
+    }
+    const hit = launchIn(tx, creator, symbol)
     if (hit) return { ...hit, signature: c.signature, blockTime: c.blockTime }
   }
   return null
@@ -259,6 +291,7 @@ export function createLaunchResolver({ rpc, env, now = Date.now, log = () => {} 
   const creator = (env.UNC_CREATOR ?? DEFAULT_CREATOR).trim()
   const sinceMs = Date.parse(env.UNC_SINCE ?? DEFAULT_SINCE)
   const since = Number.isFinite(sinceMs) ? Math.floor(sinceMs / 1000) : 0
+  const symbol = normSymbol(env.UNC_SYMBOL ?? DEFAULT_SYMBOL)
   /** @type {{ mint: string, pool: string | null, signature?: string, blockTime?: number, source: string } | null} */
   let launch = null
   let launchCheckedAt = -Infinity
@@ -286,7 +319,7 @@ export function createLaunchResolver({ rpc, env, now = Date.now, log = () => {} 
       if (isAddress(pinned)) {
         launch = { mint: pinned, pool: await findPoolByMint(rpc, pinned), source: 'pinned' }
       } else {
-        const hit = await findLaunch(rpc, { creator, since })
+        const hit = await findLaunch(rpc, { creator, since, symbol })
         if (hit) {
           launch = { ...hit, source: 'detected' }
           log(`uncatchable detected mint=${hit.mint} pool=${hit.pool} tx=${hit.signature}`)
@@ -346,7 +379,7 @@ export function createLaunchResolver({ rpc, env, now = Date.now, log = () => {} 
         once('detect', detect)
       }
       if (inflight.has('detect')) await inflight.get('detect')
-      if (!launch) return { status: reason, creator, since }
+      if (!launch) return { status: reason, creator, since, symbol: symbol || null }
       if (launch.pool && now() - curveAt >= 10_000) once('pool', refreshPoolAndFacts)
       if (inflight.has('pool') && (!facts || !curve)) await inflight.get('pool')
       return {
@@ -358,6 +391,8 @@ export function createLaunchResolver({ rpc, env, now = Date.now, log = () => {} 
         config: configKey || null,
         signature: launch.signature ?? null,
         launchedAt: launch.blockTime ?? null,
+        name: launch.name ?? null,
+        symbol: launch.symbol ?? null,
         facts,
         curve,
       }
